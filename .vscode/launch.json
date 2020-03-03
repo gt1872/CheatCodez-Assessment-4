@@ -1,0 +1,15 @@
+{
+    // Enable these tasks to keep the gradle build up-to-date
+    // and automatically generate Javadoc from annotations
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - DesktopLauncher",
+            "request": "launch",
+            "mainClass": "com.kroy.desktop.DesktopLauncher",
+            "projectName": "desktop",
+            //"preLaunchTask": "Build",
+            //"postDebugTask": "Document_Code"
+        }
+    ]
+}
