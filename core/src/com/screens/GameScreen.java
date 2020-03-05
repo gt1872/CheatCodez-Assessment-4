@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.entities.Firestation;
+import com.misc.GameSave;
 import com.misc.SFX;
 import com.pathFinding.Junction;
 import com.pathFinding.MapGraph;
@@ -33,6 +34,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 // Java util imports
+import java.io.Serializable;
 import java.util.ArrayList;
 
 // Class imports
@@ -51,7 +53,7 @@ import static com.misc.Constants.*;
  * @author Archie
  * @since 23/11/2019
  */
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, Serializable {
 
 	// A constant variable to store the game
 	final Kroy game;
@@ -105,6 +107,8 @@ public class GameScreen implements Screen {
 
 	private final CarparkScreen carparkScreen;
 	private final GameInputHandler gameInputHandler;
+
+	private boolean isSaving=false;
 
 	/**
 	 * The constructor for the main game screen. All main game logic is
@@ -412,6 +416,13 @@ public class GameScreen implements Screen {
 		// Draw the score, time and FPS to the screen at given co-ordinates
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
+
+		if (this.getFireStationTime()==170 && this.isSaving==false){
+			this.isSaving=true;
+			this.saveGame();
+
+		}
+
 		if (DEBUG_ENABLED) {
 			this.fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
 		} else {
@@ -1215,4 +1226,47 @@ public class GameScreen implements Screen {
 
 	public Firetruck getActiveTruck() {return this.firestation.getActiveFireTruck();}
 
+
+	/*
+	 *  =======================================================================
+	 *                          Added for Assessment 4
+	 *  =======================================================================
+	 */
+
+	private void saveGame(){
+		GameSave gameSave = new GameSave();
+		ArrayList objects = new ArrayList<>();
+
+//		private final ArrayList<ETFortress> ETFortresses;
+//		private final ArrayList<Projectile> projectiles;
+//		private final ArrayList<MinigameSprite> minigameSprites;
+//		private ArrayList<Projectile> projectilesToRemove;
+//		private final ArrayList<Patrol> ETPatrols;
+//		private final Firestation firestation;
+//		private final ArrayList<Texture> waterFrames;
+//		private final Texture projectileTexture;
+//		private ArrayList<Texture> patrolTextures;
+//		private int score;
+//		private int time;
+
+
+		ArrayList tmpArray = new ArrayList<>();
+
+		tmpArray.add("ETFortresses");
+		tmpArray.addAll(ETFortresses);
+		Json json = new Json();
+		System.out.println(json.toJson(ETFortresses.get(0)));
+
+
+		objects.add(tmpArray);
+
+		gameSave.saveGame(objects);
+
+
+
+	}
+
+	private void loadGame(){
+
+	}
 }

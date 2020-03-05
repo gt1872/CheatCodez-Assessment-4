@@ -10,12 +10,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import java.io.Serializable;
+
 /**
  * Custom actor to allow for a shape to be
  * rendered on the stage. Used as backgrounds
  * to actors in the car park menu.
  */
-public class BackgroundBox extends Actor {
+public class BackgroundBox extends Actor implements Serializable {
 
     // the texture that the pixmap makes
     private final Texture texture;

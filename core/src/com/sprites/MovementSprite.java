@@ -27,7 +27,7 @@ public class MovementSprite extends SimpleSprite {
     private Vector2 speed;
 
     // layer that provides collisions
-    private TiledMapTileLayer collisionLayer;
+    private transient TiledMapTileLayer collisionLayer;
 
     /**
      * Creates a sprite capable of moving and colliding with the tiledMap and other sprites.

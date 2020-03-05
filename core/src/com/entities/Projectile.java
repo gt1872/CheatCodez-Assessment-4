@@ -10,6 +10,8 @@ import com.sprites.MovementSprite;
 import com.sprites.SimpleSprite;
 
 // Constants imports
+import java.io.Serializable;
+
 import static com.misc.Constants.PROJECTILE_SPEED;
 import static com.misc.Constants.PROJECTILE_WIDTH;
 import static com.misc.Constants.PROJECTILE_HEIGHT;
@@ -22,7 +24,7 @@ import static com.misc.Constants.MAP_WIDTH;
  * @author Archie
  * @since 09/01/2020
  */
-public class Projectile extends MovementSprite {
+public class Projectile extends MovementSprite  implements Serializable {
 
     private final int damage;
 

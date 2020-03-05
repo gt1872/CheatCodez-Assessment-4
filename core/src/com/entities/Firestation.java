@@ -11,6 +11,7 @@ import com.screens.GameScreen;
 import com.sprites.SimpleSprite;
 
 // Constants import
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.misc.Constants.*;
@@ -21,7 +22,7 @@ import static com.misc.Constants.*;
  * @author Archie
  * @since 17/12/2019
  */
-public class Firestation extends SimpleSprite {
+public class Firestation extends SimpleSprite implements Serializable {
 
     private final GameScreen gameScreen;
 

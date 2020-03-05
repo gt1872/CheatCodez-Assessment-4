@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.sprites.PatrolMovementSprite;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /** This class is used to create a patrol. A patrol can
@@ -26,10 +27,10 @@ import java.util.ArrayList;
  * extends PatrolMovementSprite which determines how the
  * patrol moves around the map
  */
-public class Patrol extends PatrolMovementSprite {
+public class Patrol extends PatrolMovementSprite implements Serializable {
 
     // List of textures which are drawn on top of each other to create a 3D looking image
-    final ArrayList<Texture> textureSlices;
+    final  ArrayList<Texture> textureSlices;
 
     // Whether the patrol has been killed by a firetruck or not
     private boolean isDead;

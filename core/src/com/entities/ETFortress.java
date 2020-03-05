@@ -15,6 +15,8 @@ import com.screens.GameScreen;
 import com.sprites.SimpleSprite;
 
 // Constants import
+import java.io.Serializable;
+
 import static com.misc.Constants.ETFORTRESS_HEIGHT;
 import static com.misc.Constants.ETFORTRESS_WIDTH;
 
@@ -24,7 +26,7 @@ import static com.misc.Constants.ETFORTRESS_WIDTH;
  * @author Archie
  * @since 16/12/2019
  */
-public class ETFortress extends SimpleSprite {
+public class ETFortress extends SimpleSprite implements Serializable {
 
     // Private values for this class to use
     private final Texture destroyed;

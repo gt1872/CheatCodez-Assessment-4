@@ -19,6 +19,7 @@ import com.misc.ResourceBar;
 import com.sprites.MovementSprite;
 
 // Java util import
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.misc.Constants.*;
@@ -29,7 +30,7 @@ import static com.misc.Constants.*;
  * @author Archie
  * @since 16/12/2019
  */
-public class Firetruck extends MovementSprite {
+public class Firetruck extends MovementSprite implements Serializable {
 
     // hose values
     private Boolean isSpraying;

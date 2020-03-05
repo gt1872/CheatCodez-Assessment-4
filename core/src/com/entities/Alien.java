@@ -11,13 +11,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.misc.Constants.*;
 
+import java.io.Serializable;
+
 /**
  * Alien is a really simple sprite which also
  * keeps track of how long it has been alive,
  * and gives it certain properties depending
  * on {@link AlienType}
  */
-public class Alien extends Sprite {
+public class Alien extends Sprite implements Serializable {
 
     // type gives certain properties
     public final AlienType type;

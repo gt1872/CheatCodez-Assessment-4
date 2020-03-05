@@ -19,7 +19,6 @@ public class MinigameSprite extends Sprite {
 
     // using polygon as firetruck is a polygon, which is what it collides with
     private final Polygon hitBox;
-
     /**
      * Constructor for minigame sprite
      *
