@@ -1253,16 +1253,17 @@ public class GameScreen implements Screen, Serializable {
 		ArrayList tmpArray = new ArrayList<>();
 
 		tmpArray.add("ETFortresses");
-		tmpArray.addAll(ETFortresses);
 		Json json = new Json();
-		System.out.println(json.toJson(ETFortresses.get(0)));
 
-
-		objects.add(tmpArray);
-
-		gameSave.saveGame(objects);
-
-
+		ETFortress e = ETFortresses.get(0);
+		json.writeObjectStart();
+		json.writeValue(e);
+		json.writeObjectEnd();
+		System.out.println(json.prettyPrint(json));
+//		tmpArray.add(stringify);
+//		objects.add(tmpArray);
+//		System.out.println(objects.toString());
+		//gameSave.saveGame(objects);
 
 	}
 

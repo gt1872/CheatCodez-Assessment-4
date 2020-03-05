@@ -21,11 +21,6 @@ public class GameSave {
         Date date = new Date();
         return formatter.format(date);
     }
-//
-//    public ArrayList loadGameSaves(){
-//
-//    }
-
 
 
     public void loadGame(String filepath) throws IOException {
