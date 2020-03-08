@@ -257,5 +257,11 @@ public class ResourceBar {
      * Set the current resource amount
      * @param amt - Int, what you want to set it to
      */
-    public void setCurrentResourceAmount(int amt){ this.currentResourceAmount = amt; }
+    public void setCurrentResourceAmount(int amt){
+        this.currentResourceAmount=amt;
+        this.bar.setValue(amt);
+        this.bar.setStyle(getResourceBarStyle());
+        System.out.println(this.bar.getValue());
+
+    }
 }

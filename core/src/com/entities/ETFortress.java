@@ -144,6 +144,9 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
 
     }
 
+    public void setGameScreen(GameScreen screen ){this.gameScreen=screen;}
+
+
 
     @Override
     public void write(Json json) {
@@ -152,8 +155,8 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         json.writeValue("health", type.getHealth()-this.getHealthBar().getCurrentAmount());
         json.writeValue("xPos", this.getX());
         json.writeValue("yPos", this.getY());
-        json.writeValue("texture", this.getTexture());
-        json.writeValue("destroyedTexture", this.destroyed);
+        json.writeValue("texture", this.getTexture().toString());
+        json.writeValue("destroyedTexture", this.destroyed.toString());
         json.writeValue("xScale", this.getScaleX());
         json.writeValue("yScale", this.getScaleY());
     }
@@ -164,9 +167,14 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         System.out.println(jsonData.get("health").asInt());
 
         String fortType = jsonData.get("fortressType").asString();
+        System.out.println(jsonData.get("texture").toString());
+
+        Texture texture = new Texture(jsonData.get("texture").asString());
+        setTexture(texture);
 
         switch (fortType){
             case "CLIFFORD": {
+                System.out.println("Changing type...");
                 type=FortressType.CLIFFORD;
                 break;
             }
@@ -191,12 +199,17 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
                 break;
             }
         }
-                // Set the health from the Type as opposed to the stored health to store max etc
+
         this.getHealthBar().setMaxResource(type.getHealth());
+        System.out.println(String.format("CURRENT AMOUNT: %f", this.getHealthBar().getCurrentAmount()));
 
+        // Set the health from the Type as opposed to the stored health to store max etc
+        System.out.println(this.getHealthBar().getCurrentAmount());
         this.getHealthBar().setCurrentResourceAmount(
-                type.getHealth()-jsonData.get("health").asInt());
+                (int) (this.getHealthBar().getMaxAmount()-jsonData.get("health").asInt()));
+        System.out.println(String.format("CURRENT AMOUNT: %f", this.getHealthBar().getCurrentAmount()));
 
+        //this.getHealthBar().setMaxResource(type.getHealth());
 
         System.out.println(toString());
 

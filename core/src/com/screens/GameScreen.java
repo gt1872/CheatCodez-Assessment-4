@@ -423,18 +423,18 @@ public class GameScreen implements Screen, Serializable {
 		// Draw the score, time and FPS to the screen at given co-ordinates
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
-//
+
 //		if (this.getFireStationTime()==165 && this.isSaving==false){
 //
 //			this.isSaving=true;
 //			this.saveGame();
 //
 //		}
-//
-////
+
+
 		if (this.getFireStationTime()==170 && this.isSaving==false){
 		    this.isSaving=true;
-		    this.loadGame("07-03-2020-19-52-50");
+		    this.loadGame("08-03-2020-14-39-58");
         }
 
 
@@ -1313,13 +1313,15 @@ public class GameScreen implements Screen, Serializable {
 					currType="ETFortress";
 					if (i>0){
 						ETFortress e = json.fromJson(ETFortress.class, currOb);
-
+						e.setTexture(new Texture("MapAssets/UniqueBuildings/cliffordstower.png"));
+						e.setGameScreen(this);
+						tempObjects.add(e);
 
 
 					}
 				}
-
         	}
+			ETFortresses = tempObjects;
 
 
 		}
