@@ -246,4 +246,16 @@ public class ResourceBar {
         this.currentResourceAmount = this.maxResourceAmount;
     }
 
+
+    /*
+     *  =======================================================================
+     *                          Added for Assessment 4
+     *  =======================================================================
+     */
+
+    /**
+     * Set the current resource amount
+     * @param amt - Int, what you want to set it to
+     */
+    public void setCurrentResourceAmount(int amt){ this.currentResourceAmount = amt; }
 }

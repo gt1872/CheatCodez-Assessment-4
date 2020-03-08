@@ -45,6 +45,7 @@ import com.sprites.MinigameSprite;
 
 // Constants import
 import static com.misc.Constants.*;
+import static com.misc.Constants.FortressType.CLIFFORD;
 
 
 /**
@@ -75,7 +76,7 @@ public class GameScreen implements Screen, Serializable {
 	private float zoomTarget;
 
 	// Private sprite related objects
-	private final ArrayList<ETFortress> ETFortresses;
+	private ArrayList<ETFortress> ETFortresses;
 	private final ArrayList<Projectile> projectiles;
 	private final ArrayList<MinigameSprite> minigameSprites;
 	private ArrayList<Projectile> projectilesToRemove;
@@ -212,16 +213,22 @@ public class GameScreen implements Screen, Serializable {
 		// Initialise textures to use for sprites
 		Texture firestationTexture = new Texture("MapAssets/UniqueBuildings/firestation.png");
 		Texture firestationDestroyedTexture = new Texture("MapAssets/UniqueBuildings/firestation_destroyed.png");
+
 		Texture cliffordsTowerTexture = new Texture("MapAssets/UniqueBuildings/cliffordstower.png");
 		Texture cliffordsTowerWetTexture = new Texture("MapAssets/UniqueBuildings/cliffordstower_wet.png");
+
 		Texture railstationTexture = new Texture("MapAssets/UniqueBuildings/railstation.png");
 		Texture railstationWetTexture = new Texture("MapAssets/UniqueBuildings/railstation_wet.png");
+
 		Texture yorkMinsterTexture = new Texture("MapAssets/UniqueBuildings/Yorkminster.png");
 		Texture yorkMinsterWetTexture = new Texture("MapAssets/UniqueBuildings/Yorkminster_wet.png");
+
 		Texture castle1Texture = new Texture("MapAssets/UniqueBuildings/fortress_1.png");
 		Texture castle1WetTexture = new Texture("MapAssets/UniqueBuildings/fortress_1_wet.png");
+
 		Texture castle2Texture = new Texture("MapAssets/UniqueBuildings/fortress_2.png");
 		Texture castle2WetTexture = new Texture("MapAssets/UniqueBuildings/fortress_2_wet.png");
+
 		Texture mossyTexture = new Texture("MapAssets/UniqueBuildings/mossy.png");
 		Texture mossyWetTexture = new Texture("MapAssets/UniqueBuildings/mossy_wet.png");
 
@@ -254,7 +261,7 @@ public class GameScreen implements Screen, Serializable {
 
 		// Initialise ETFortresses array and add ETFortresses to it
 		this.ETFortresses = new ArrayList<ETFortress>();
-		this.ETFortresses.add(new ETFortress(cliffordsTowerTexture, cliffordsTowerWetTexture, 1, 1, 69 * TILE_DIMS, 51 * TILE_DIMS, FortressType.CLIFFORD, this));
+		this.ETFortresses.add(new ETFortress(cliffordsTowerTexture, cliffordsTowerWetTexture, 1, 1, 69 * TILE_DIMS, 51 * TILE_DIMS, CLIFFORD, this));
 		this.ETFortresses.add(new ETFortress(yorkMinsterTexture, yorkMinsterWetTexture, 2, 3.25f, 68.25f * TILE_DIMS, 82.25f * TILE_DIMS, FortressType.MINSTER, this));
 		this.ETFortresses.add(new ETFortress(railstationTexture, railstationWetTexture, 2, 2.5f, TILE_DIMS, 72.75f * TILE_DIMS, FortressType.RAIL, this));
 		this.ETFortresses.add(new ETFortress(castle2Texture, castle2WetTexture, 2, 2, 10 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE2, this));
@@ -416,12 +423,26 @@ public class GameScreen implements Screen, Serializable {
 		// Draw the score, time and FPS to the screen at given co-ordinates
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
-
+//
+//		if (this.getFireStationTime()==165 && this.isSaving==false){
+//
+//			this.isSaving=true;
+//			this.saveGame();
+//
+//		}
+//
+////
 		if (this.getFireStationTime()==170 && this.isSaving==false){
-			this.isSaving=true;
-			this.saveGame();
+		    this.isSaving=true;
+		    this.loadGame("07-03-2020-19-52-50");
+        }
 
-		}
+
+//		if (this.getFireStationTime()==170){
+//			for (ETFortress et: ETFortresses){
+//				et.getHealthBar().subtractResourceAmount(1);
+//			}
+//		}
 
 		if (DEBUG_ENABLED) {
 			this.fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
@@ -1249,25 +1270,59 @@ public class GameScreen implements Screen, Serializable {
 //		private int score;
 //		private int time;
 
-
+        // Create empty temporary array for storing the json for each object
 		ArrayList tmpArray = new ArrayList<>();
 
+		// Add ETFortresses to the objects array
+        Json obj = new Json();
 		tmpArray.add("ETFortresses");
-		Json json = new Json();
+		// Iterate through ETFortresses and add them to temp array using the custom write and read methods
+		for (ETFortress e: ETFortresses)
+			tmpArray.add(obj.toJson(e));
+		objects.add(tmpArray);
 
-		ETFortress e = ETFortresses.get(0);
-		json.writeObjectStart();
-		json.writeValue(e);
-		json.writeObjectEnd();
-		System.out.println(json.prettyPrint(json));
-//		tmpArray.add(stringify);
-//		objects.add(tmpArray);
-//		System.out.println(objects.toString());
-		//gameSave.saveGame(objects);
+		// Save to file
+		gameSave.saveGame(objects);
 
 	}
 
-	private void loadGame(){
+	private void loadGame(String file){
+        GameSave gameSave = new GameSave();
+        System.out.println("loadingGame");
+
+        // Load the file requested
+        ArrayList masterObjects = gameSave.loadGame(file);
+        // Iterate through the sets of objects
+
+
+        for (Object objects: masterObjects){
+        	// Load the set of objects into arraylist
+			ArrayList<String> obs = (ArrayList)objects;
+
+			// Store the type to correctly replace the original objects
+			String currType ="";
+
+			// Store items to replace the original store
+			ArrayList tempObjects = new ArrayList();
+
+			// Iterate through objects
+			for (int i = 0; i<obs.size();i++){
+        		String currOb = obs.get(i);
+				Json json = new Json();
+        		if (obs.get(0).equals("ETFortresses")) {
+					currType="ETFortress";
+					if (i>0){
+						ETFortress e = json.fromJson(ETFortress.class, currOb);
+
+
+
+					}
+				}
+
+        	}
+
+
+		}
 
 	}
 }

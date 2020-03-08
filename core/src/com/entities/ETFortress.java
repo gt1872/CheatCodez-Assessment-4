@@ -1,6 +1,7 @@
 package com.entities;
 
 // LibGDX imports
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
@@ -8,14 +9,18 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.GL20;
 
 // Custom class import
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants.*;
 import com.screens.GameScreen;
 import com.sprites.SimpleSprite;
 
 // Constants import
 import java.io.Serializable;
+import java.util.Iterator;
 
 import static com.misc.Constants.ETFORTRESS_HEIGHT;
 import static com.misc.Constants.ETFORTRESS_WIDTH;
@@ -26,13 +31,13 @@ import static com.misc.Constants.ETFORTRESS_WIDTH;
  * @author Archie
  * @since 16/12/2019
  */
-public class ETFortress extends SimpleSprite implements Serializable {
+public class ETFortress extends SimpleSprite implements Json.Serializable {
 
     // Private values for this class to use
-    private final Texture destroyed;
+    private Texture destroyed;
     private boolean flooded;
-    private final FortressType type;
-    private final GameScreen gameScreen;
+    private FortressType type =null;
+    private GameScreen gameScreen = null;
 
     /**
      * Overloaded constructor containing all possible parameters.
@@ -49,6 +54,7 @@ public class ETFortress extends SimpleSprite implements Serializable {
      */
     public ETFortress(Texture texture, Texture destroyedTexture, float scaleX, float scaleY, float xPos, float yPos, FortressType type, GameScreen gameScreen) {
         super(texture);
+
         this.gameScreen = gameScreen;
         this.destroyed = destroyedTexture;
         this.flooded = false;
@@ -123,4 +129,88 @@ public class ETFortress extends SimpleSprite implements Serializable {
     public FortressType getType() {
         return this.type;
     }
+
+
+    /*
+
+    =========================================================
+                    Added for assessment 4
+    =========================================================
+
+     */
+
+    public ETFortress(){
+        super(new Texture("MapAssets/UniqueBuildings/Yorkminster_wet.png"));
+
+    }
+
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("flooded", flooded);
+        json.writeValue("fortressType", type.getStatus());
+        json.writeValue("health", type.getHealth()-this.getHealthBar().getCurrentAmount());
+        json.writeValue("xPos", this.getX());
+        json.writeValue("yPos", this.getY());
+        json.writeValue("texture", this.getTexture());
+        json.writeValue("destroyedTexture", this.destroyed);
+        json.writeValue("xScale", this.getScaleX());
+        json.writeValue("yScale", this.getScaleY());
+    }
+
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        System.out.println(jsonData.get("health").asInt());
+
+        String fortType = jsonData.get("fortressType").asString();
+
+        switch (fortType){
+            case "CLIFFORD": {
+                type=FortressType.CLIFFORD;
+                break;
+            }
+            case "MINSTER":{
+                type=FortressType.MINSTER;
+                break;
+            }
+            case "RAIL":{
+                type=FortressType.RAIL;
+                break;
+            }
+            case "CASTLE1":{
+                type=FortressType.CASTLE1;
+                break;
+            }
+            case "CASTLE2":{
+                type=FortressType.CASTLE2;
+                break;
+            }
+            case "MOSSY":{
+                type=FortressType.MOSSY;
+                break;
+            }
+        }
+                // Set the health from the Type as opposed to the stored health to store max etc
+        this.getHealthBar().setMaxResource(type.getHealth());
+
+        this.getHealthBar().setCurrentResourceAmount(
+                type.getHealth()-jsonData.get("health").asInt());
+
+
+        System.out.println(toString());
+
+
+
+    }
+
+    public String toString(){
+        return String.format("FLOODED = %b | TYPE = %s | HEALTH = %f | TEXTURE = %s",flooded, type, getHealthBar().getCurrentAmount(), this.getTexture().toString());
+    }
+
+    public void setFlooded(boolean flooded) {
+        this.flooded = flooded;
+    }
+
+    public boolean getFlooded(){ return this.flooded; }
 }

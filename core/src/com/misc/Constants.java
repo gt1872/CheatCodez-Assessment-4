@@ -59,6 +59,9 @@ public final class Constants {
             return this.range;
         }
 
+        public String getStatus() {
+            return this.name();
+        }
         public int getHealth() {
             return this.health;
         }
