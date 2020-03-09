@@ -1312,10 +1312,9 @@ public class GameScreen implements Screen, Serializable {
         		if (obs.get(0).equals("ETFortresses")) {
 					currType="ETFortress";
 					if (i>0){
-						ETFortress e = json.fromJson(ETFortress.class, currOb);
-						e.setTexture(new Texture("MapAssets/UniqueBuildings/cliffordstower.png"));
-						e.setGameScreen(this);
-						tempObjects.add(e);
+                        JsonReader jReader = new JsonReader();
+                        JsonValue object = jReader.parse(currOb);
+
 
 
 					}
