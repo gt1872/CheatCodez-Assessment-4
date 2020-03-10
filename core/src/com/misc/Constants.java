@@ -3,6 +3,7 @@ package com.misc;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import org.w3c.dom.Text;
 
 /**
  * Game constants for use by Kroy.
@@ -123,6 +124,50 @@ public final class Constants {
         }
     }
 
+    public enum PowerUpType {
+         healthBoost(1.5f,0f,0f,0f,0f, new Texture("PowerUps/HEALTH_TOPUP.png"));
+         private final float healthMultiplier;
+        private final float waterMultiplier;
+        private final float speedMultiplier;
+        private final float rangeMultiplier;
+        private final float damageMultiplier;
+
+        private final Texture texture;
+
+        PowerUpType(float healthMultiplier, float waterMultiplier, float speedMultiplier, float rangeMultiplier, float damageMultiplier, Texture texture){
+            this.healthMultiplier = healthMultiplier;
+            this.waterMultiplier = waterMultiplier;
+            this.speedMultiplier = speedMultiplier;
+            this.rangeMultiplier = rangeMultiplier;
+            this.damageMultiplier = damageMultiplier;
+            this.texture = texture;
+        }
+
+        public float getHealthMultiplier() {
+            return healthMultiplier;
+        }
+
+        public float getWaterMultiplier() {
+            return waterMultiplier;
+        }
+
+        public float getSpeedMultiplier() {
+            return speedMultiplier;
+        }
+
+        public float getRangeMultiplier() {
+            return rangeMultiplier;
+        }
+
+        public float getDamageMultiplier() {
+            return damageMultiplier;
+        }
+
+        public Texture getTexture() {
+            return texture;
+        }
+    }
+
     public enum AlienType {
 
         green(10, 0.5, new Texture(Gdx.files.internal("Minigame/alien_2.png")), 1000),
@@ -226,4 +271,12 @@ public final class Constants {
     public static final float ETFORTRESS_HEIGHT =5*TILE_DIMS;
     public static final float PROJECTILE_WIDTH = TILE_DIMS;
     public static final float PROJECTILE_HEIGHT =0.5f*TILE_DIMS;
+
+    public static final float DIFFICULTY_EASY_MODIFIER = 0.5f;
+    public static final float DIFFICULTY_MEDIUM_MODIFIER = 1f;
+    public static final float DIFFICULTY_HARD_MODIFIER  = 2f;
+    public static float DIFFICULTY_MODIFIER;
+
+    public static final int POWERUP_SPAWN_TIME = 30;
+
 }

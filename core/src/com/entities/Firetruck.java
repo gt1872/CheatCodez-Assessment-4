@@ -173,6 +173,12 @@ public class Firetruck extends MovementSprite {
 
     }
 
+    public void applyPowerUp(PowerUpType powerUp){
+        System.out.println("Firetruck old max Health: " + this.getHealthBar().getMaxAmount());
+        this.getHealthBar().setMaxResource((int) (this.getHealthBar().getMaxAmount() * powerUp.getHealthMultiplier()));
+        System.out.println("Firetruck new max Health: " + this.getHealthBar().getMaxAmount());
+    }
+
     /**
      * Checks if the firetruck enters a car park, set the respawn location
      * of the fire truck to that car park and sets the menu to be opened
@@ -498,6 +504,7 @@ public class Firetruck extends MovementSprite {
     }
 
     public void setArrow(boolean b) {this.isArrowVisible = b;}
+
 
     /**
      * Dispose of all textures used by this class and its parents.

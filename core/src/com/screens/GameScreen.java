@@ -34,6 +34,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 // Java util imports
 import java.util.ArrayList;
+import java.util.Random;
 
 // Class imports
 import com.entities.*;
@@ -70,13 +71,16 @@ public class GameScreen implements Screen {
 	// Private values for the game
 	private int score;
 	private int time;
+	private int powerUpTime;
 	private float zoomTarget;
 
 	// Private sprite related objects
 	private final ArrayList<ETFortress> ETFortresses;
+	private final ArrayList<PowerUp> powerUps;
 	private final ArrayList<Projectile> projectiles;
 	private final ArrayList<MinigameSprite> minigameSprites;
 	private ArrayList<Projectile> projectilesToRemove;
+	private ArrayList<PowerUp> powerUpsToRemove;
 	private final ArrayList<Patrol> ETPatrols;
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
@@ -100,6 +104,7 @@ public class GameScreen implements Screen {
 
 	// timers to manage timed events
 	private final Timer popupTimer;
+	private final Timer powerUpTimer;
 	private final Timer firestationTimer;
 	private final Timer ETPatrolsTimer;
 
@@ -136,10 +141,10 @@ public class GameScreen implements Screen {
 
 		// Create an array to store all projectiles in motion
 		this.projectiles = new ArrayList<>();
-
+		this.powerUps = new ArrayList<>();
 		// Decrease time every second, starting at 3 minutes
 		this.time = TIME_STATION_VULNERABLE;
-
+		this.powerUpTime = POWERUP_SPAWN_TIME;
 		gameInputHandler = new GameInputHandler(this);
 
 		// ---- 2) Initialise and set game properties ----------------------------- //
@@ -256,9 +261,10 @@ public class GameScreen implements Screen {
 		this.ETFortresses.add(new ETFortress(castle2Texture, castle2WetTexture, 2, 2, 10 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE2, this));
 		this.ETFortresses.add(new ETFortress(castle1Texture, castle1WetTexture, 2, 2, 98 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE1, this));
 		this.ETFortresses.add(new ETFortress(mossyTexture, mossyWetTexture, 1.5f, 1.5f, 106 * TILE_DIMS, 101 * TILE_DIMS, FortressType.MOSSY, this));
-
+decreaseTime();
 		// Create array to collect entities that are no longer used
 		this.projectilesToRemove = new ArrayList<Projectile>();
+		this.powerUpsToRemove = new ArrayList<PowerUp>();
 
 		this.junctionsInMap = new ArrayList<>();
 		mapGraph = new MapGraph();
@@ -272,7 +278,13 @@ public class GameScreen implements Screen {
 			}
 		}, 1, 1);
 		firestationTimer.stop();
-
+		powerUpTimer = new Timer();
+		powerUpTimer.scheduleTask(new Task() {
+			@Override
+			public void run() {
+				decreasePowerUpTimer();
+			}
+		}, 1, 1);
 		popupTimer = new Timer();
 		popupTimer.scheduleTask(new Task() {
 			@Override
@@ -305,6 +317,7 @@ public class GameScreen implements Screen {
 		this.camera.position.set(this.firestation.getActiveFireTruck().getCentreX(), this.firestation.getActiveFireTruck().getCentreY(), 0);
 		// Create array to collect entities that are no longer used
 		this.projectilesToRemove = new ArrayList<Projectile>();
+		this.powerUpsToRemove =  new ArrayList<PowerUp>();
 		Gdx.input.setInputProcessor(gameInputHandler);
 	}
 
@@ -315,7 +328,6 @@ public class GameScreen implements Screen {
 	 */
 	@Override
 	public void render(float delta) {
-
 		// MUST BE FIRST: Clear the screen each frame to stop textures blurring
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -342,7 +354,6 @@ public class GameScreen implements Screen {
 
 		// Get the firetruck thats being driven so that the camera can follow it
 		Firetruck focusedTruck = this.firestation.getActiveFireTruck();
-
 		// ==============================================================
 		//					Modified for assessment 3
 		// ==============================================================
@@ -381,6 +392,9 @@ public class GameScreen implements Screen {
 			ETFortress.update(this.game.batch);
 			if (DEBUG_ENABLED) ETFortress.drawDebug(shapeRenderer);
 		}
+		for (PowerUp powerUp : this.powerUps){
+			powerUp.update(this.game.batch);
+		}
 		for (Projectile projectile : this.projectiles) {
 			projectile.update(this.game.batch);
 			if (DEBUG_ENABLED) projectile.drawDebug(shapeRenderer);
@@ -396,7 +410,7 @@ public class GameScreen implements Screen {
 			if (DEBUG_ENABLED) patrol.drawDebug(shapeRenderer);
 		}
 
-		// Render mini game sprites
+		// Render mini game spritesdecreasePowerUpTimer
 		for (MinigameSprite minigameSprite : minigameSprites) {
 			minigameSprite.update(this.game.batch);
 		}
@@ -404,6 +418,12 @@ public class GameScreen implements Screen {
 		this.firestation.update(this.game.batch);
 
 		if (DEBUG_ENABLED) firestation.drawDebug(shapeRenderer);
+
+		if(powerUpTime <= 0){
+			powerUpTime = POWERUP_SPAWN_TIME;
+			Random rand = new Random();
+			powerUps.add(mapGraph.getJunctions().get(rand.nextInt(mapGraph.getJunctions().size - 1)).generatePowerUp());
+		}
 
 		// Finish rendering
 		this.game.batch.end();
@@ -429,9 +449,10 @@ public class GameScreen implements Screen {
 		// Remove projectiles that are off the screen and firetrucks that are dead
 		this.projectiles.removeAll(this.projectilesToRemove);
 
+		this.powerUps.removeAll(this.powerUpsToRemove);
+
 		// Check if the game should end
 		checkIfGameOver();
-
 		checkIfCarpark();
 	}
 
@@ -532,7 +553,7 @@ public class GameScreen implements Screen {
 		}
 	}
 
-	/*
+	/*decreasePowerUpTimer
 	 *  =======================================================================
 	 *                          Added for Assessment 3
 	 *  =======================================================================
@@ -587,10 +608,21 @@ public class GameScreen implements Screen {
 				this.score += 10;
 			}
 			if (ETFortress.isInRadius(firetruck.getCentre()) && ETFortress.canShootProjectile()) {
-				Projectile projectile = new Projectile(this.projectileTexture, ETFortress.getCentreX(), ETFortress.getCentreY(), ETFortress.getType().getDamage());
+				Projectile projectile = new Projectile(this.projectileTexture, ETFortress.getCentreX(), ETFortress.getCentreY(), (int) (ETFortress.getType().getDamage() * DIFFICULTY_MODIFIER));
 				projectile.calculateTrajectory(firetruck);
 				SFX.sfx_projectile.play();
 				this.projectiles.add(projectile);
+			}
+		}
+
+		// ==============================================================
+		//					Added for assessment 4
+		// ==============================================================
+
+		for (PowerUp powerUp : powerUps){
+			if(powerUp.getDamageHitBox().contains(firetruck.getCentreX(),firetruck.getCentreY())){
+				firetruck.applyPowerUp(powerUp.getType());
+				powerUpsToRemove.add(powerUp);
 			}
 		}
 
@@ -669,7 +701,9 @@ public class GameScreen implements Screen {
 	private void decreaseTime() {
 		this.time -= 1;
 	}
-
+	private void decreasePowerUpTimer(){
+		this.powerUpTime -= 1;
+	}
 	/*
 	 *  =======================================================================
 	 *                          Modified for Assessment 3

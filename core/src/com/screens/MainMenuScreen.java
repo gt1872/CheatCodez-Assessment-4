@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.Kroy;
 import com.misc.SFX;
 
-import static com.misc.Constants.DEBUG_ENABLED;
+import static com.misc.Constants.*;
 
 /**
  * Displays the main menu screen with selection buttons.
@@ -117,7 +117,9 @@ public class MainMenuScreen implements Screen {
 		Label heading = new Label("Kroy", new Label.LabelStyle(game.coolFont, Color.WHITE));
 		heading.setFontScale(2);
 		Label subHeading = new Label("Destroy the Fortresses and Save the City", new Label.LabelStyle(game.coolFont, Color.WHITE));
-		TextButton playButton = new TextButton("Play", skin);
+		TextButton playButtonEasy = new TextButton("Play Easy Mode", skin);
+		TextButton playButtonMedium = new TextButton("Play Normal Mode", skin);
+		TextButton playButtonHard = new TextButton("Play Hard Mode", skin);
 		TextButton howToPlayButton = new TextButton("How to Play", skin);
 		TextButton quitButton = new TextButton("Quit", skin);
 
@@ -126,22 +128,46 @@ public class MainMenuScreen implements Screen {
 		buttonTable.row();
 		buttonTable.add(subHeading).padBottom(20);
 		buttonTable.row();
-		buttonTable.add(playButton).padBottom(20).width(200).height(40);
+		buttonTable.add(playButtonEasy).padBottom(20).width(200).height(40);
+		buttonTable.row();
+		buttonTable.add(playButtonMedium).padBottom(20).width(200).height(40);
+		buttonTable.row();
+		buttonTable.add(playButtonHard).padBottom(20).width(200).height(40);
 		buttonTable.row();
 		buttonTable.add(howToPlayButton).padBottom(20).width(200).height(40);
 		buttonTable.row();
 		buttonTable.add(quitButton).width(200).height(40);
 
+
+
 		// Add listeners
-		playButton.addListener(new ClickListener() {
+		playButtonEasy.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				SFX.sfx_button_click.play();
+				DIFFICULTY_MODIFIER = DIFFICULTY_EASY_MODIFIER;
 				game.setScreen(new StoryScreen(game));
 				dispose();
 			}
 		});
-
+		playButtonMedium.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				SFX.sfx_button_click.play();
+				DIFFICULTY_MODIFIER = DIFFICULTY_MEDIUM_MODIFIER;
+				game.setScreen(new StoryScreen(game));
+				dispose();
+			}
+		});
+		playButtonHard.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				SFX.sfx_button_click.play();
+				DIFFICULTY_MODIFIER = DIFFICULTY_HARD_MODIFIER;
+				game.setScreen(new StoryScreen(game));
+				dispose();
+			}
+		});
 		howToPlayButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
