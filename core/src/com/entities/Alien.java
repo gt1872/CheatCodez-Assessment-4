@@ -6,8 +6,11 @@ package com.entities;
  *  =======================================================================
  */
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.misc.Constants.*;
 
@@ -19,13 +22,13 @@ import java.io.Serializable;
  * and gives it certain properties depending
  * on {@link AlienType}
  */
-public class Alien extends Sprite implements Serializable {
+public class Alien extends Sprite implements Json.Serializable {
 
     // type gives certain properties
-    public final AlienType type;
+    public AlienType type;
 
     // time alien was spawned
-    private final long spawnTime;
+    private long spawnTime;
 
     /**
      * Constructor for Alien, which is called
@@ -50,6 +53,35 @@ public class Alien extends Sprite implements Serializable {
     public long getSpawnTime() {
         return this.spawnTime;
     }
+
+    /*
+     * ==============================================
+     *           Added for Assessment 4
+     * ==============================================
+     */
+
+    public Alien(){ super( new Texture("Minigame/alien_2.png")); }
+
+    /**
+     *
+     *
+     * @param json
+     */
+    @Override
+    public void write(Json json) {
+        json.writeValue("alienType", type.getStatus());
+        json.writeValue("spawnTime", spawnTime);
+        json.writeValue("score", type.getScore());
+        json.writeValue("xPos", super.getX());
+        json.writeValue("yPos", super.getY());
+
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        // Unused
+    }
+
 }
 
 

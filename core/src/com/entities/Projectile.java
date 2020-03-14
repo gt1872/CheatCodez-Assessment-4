@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Texture;
 
 // Custom class import
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.sprites.MovementSprite;
 import com.sprites.SimpleSprite;
 
@@ -24,9 +26,9 @@ import static com.misc.Constants.MAP_WIDTH;
  * @author Archie
  * @since 09/01/2020
  */
-public class Projectile extends MovementSprite  implements Serializable {
+public class Projectile extends MovementSprite  implements Json.Serializable {
 
-    private final int damage;
+    private int damage;
 
     /**
      * Overloaded constructor containing all possible parameters.
@@ -105,4 +107,23 @@ public class Projectile extends MovementSprite  implements Serializable {
         return this.damage;
     }
 
+    /*
+        ================================================
+                    Added for Assessment 4
+        ================================================
+     */
+
+    public Projectile(){ super( new Texture( "alienProjectile.png" )); }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("xPos", this.getX());
+        json.writeValue("yPos", this.getY());
+        json.writeValue("damage", this.damage);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+
+    }
 }

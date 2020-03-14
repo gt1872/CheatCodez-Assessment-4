@@ -157,66 +157,12 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         json.writeValue("destroyedTexture", this.destroyed.toString());
         json.writeValue("xScale", this.getScaleX());
         json.writeValue("yScale", this.getScaleY());
-
+        json.writeValue("class", ETFortress.class.toString());
     }
 
 
     @Override
-    public void read(Json json, JsonValue jsonData) {
-
-        // Original solution
-//        System.out.println(jsonData.get("health").asInt());
-//
-//        String fortType = jsonData.get("fortressType").asString();
-//        System.out.println(jsonData.get("texture").toString());
-//
-//        Texture texture = new Texture(jsonData.get("texture").asString());
-//        setTexture(texture);
-//
-//        switch (fortType){
-//            case "CLIFFORD": {
-//                System.out.println("Changing type...");
-//                type=FortressType.CLIFFORD;
-//                break;
-//            }
-//            case "MINSTER":{
-//                type=FortressType.MINSTER;
-//                break;
-//            }
-//            case "RAIL":{
-//                type=FortressType.RAIL;
-//                break;
-//            }
-//            case "CASTLE1":{
-//                type=FortressType.CASTLE1;
-//                break;
-//            }
-//            case "CASTLE2":{
-//                type=FortressType.CASTLE2;
-//                break;
-//            }
-//            case "MOSSY":{
-//                type=FortressType.MOSSY;
-//                break;
-//            }
-//        }
-//
-//        this.getHealthBar().setMaxResource(type.getHealth());
-//        System.out.println(String.format("CURRENT AMOUNT: %f", this.getHealthBar().getCurrentAmount()));
-//
-//        // Set the health from the Type as opposed to the stored health to store max etc
-//        System.out.println(this.getHealthBar().getCurrentAmount());
-//        this.getHealthBar().setCurrentResourceAmount(
-//                (int) (this.getHealthBar().getMaxAmount()-jsonData.get("health").asInt()));
-//        System.out.println(String.format("CURRENT AMOUNT: %f", this.getHealthBar().getCurrentAmount()));
-//
-//        //this.getHealthBar().setMaxResource(type.getHealth());
-//
-//        System.out.println(toString());
-//
-
-
-    }
+    public void read(Json json, JsonValue jsonData) { }
 
     public String toString(){
         return String.format("FLOODED = %b | TYPE = %s | HEALTH = %f | TEXTURE = %s",flooded, type, getHealthBar().getCurrentAmount(), this.getTexture().toString());
@@ -226,5 +172,4 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         this.flooded = flooded;
     }
 
-    public boolean getFlooded(){ return this.flooded; }
 }

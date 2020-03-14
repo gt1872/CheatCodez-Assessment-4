@@ -7,6 +7,8 @@ package com.entities;
  */
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants;
 import com.pathFinding.MapGraph;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,7 +29,7 @@ import java.util.ArrayList;
  * extends PatrolMovementSprite which determines how the
  * patrol moves around the map
  */
-public class Patrol extends PatrolMovementSprite implements Serializable {
+public class Patrol extends PatrolMovementSprite implements Json.Serializable {
 
     // List of textures which are drawn on top of each other to create a 3D looking image
     final  ArrayList<Texture> textureSlices;
@@ -139,6 +141,26 @@ public class Patrol extends PatrolMovementSprite implements Serializable {
         return this.isDead;
     }
 
+    /*
+
+        ===============================================
+                     Added for Assessment 4
+        ===============================================
+     */
+
+    /**
+     *
+     * @param json
+     */
+    @Override
+    public void write(Json json) {
+
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+
+    }
 }
 
 

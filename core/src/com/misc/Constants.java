@@ -155,6 +155,10 @@ public final class Constants {
             return aliveTime;
         }
 
+        public String getStatus() {
+            return this.name();
+        }
+
     }
 
     public enum CarparkEntrances {
@@ -187,6 +191,11 @@ public final class Constants {
         public String getName() {
             return this.name;
         }
+
+        public String getStatus() {
+            return this.name();
+        }
+
     }
 
     // Debug mode

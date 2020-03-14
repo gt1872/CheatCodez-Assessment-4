@@ -34,8 +34,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 // Java util imports
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 // Class imports
 import com.entities.*;
@@ -45,7 +47,7 @@ import com.sprites.MinigameSprite;
 
 // Constants import
 import static com.misc.Constants.*;
-import static com.misc.Constants.FortressType.CLIFFORD;
+import static com.misc.Constants.FortressType.*;
 
 
 /**
@@ -263,8 +265,8 @@ public class GameScreen implements Screen, Serializable {
 		this.ETFortresses = new ArrayList<ETFortress>();
 		this.ETFortresses.add(new ETFortress(cliffordsTowerTexture, cliffordsTowerWetTexture, 1, 1, 69 * TILE_DIMS, 51 * TILE_DIMS, CLIFFORD, this));
 		this.ETFortresses.add(new ETFortress(yorkMinsterTexture, yorkMinsterWetTexture, 2, 3.25f, 68.25f * TILE_DIMS, 82.25f * TILE_DIMS, FortressType.MINSTER, this));
-		this.ETFortresses.add(new ETFortress(railstationTexture, railstationWetTexture, 2, 2.5f, TILE_DIMS, 72.75f * TILE_DIMS, FortressType.RAIL, this));
-		this.ETFortresses.add(new ETFortress(castle2Texture, castle2WetTexture, 2, 2, 10 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE2, this));
+		this.ETFortresses.add(new ETFortress(railstationTexture, railstationWetTexture, 2, 2.5f, TILE_DIMS, 72.75f * TILE_DIMS, RAIL, this));
+		this.ETFortresses.add(new ETFortress(castle2Texture, castle2WetTexture, 2, 2, 10 * TILE_DIMS, TILE_DIMS, CASTLE2, this));
 		this.ETFortresses.add(new ETFortress(castle1Texture, castle1WetTexture, 2, 2, 98 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE1, this));
 		this.ETFortresses.add(new ETFortress(mossyTexture, mossyWetTexture, 1.5f, 1.5f, 106 * TILE_DIMS, 101 * TILE_DIMS, FortressType.MOSSY, this));
 
@@ -424,7 +426,7 @@ public class GameScreen implements Screen, Serializable {
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
 
-//		if (this.getFireStationTime()==165 && this.isSaving==false){
+//		if (this.getFireStationTime()==178 && this.isSaving==false){
 //
 //			this.isSaving=true;
 //			this.saveGame();
@@ -434,7 +436,7 @@ public class GameScreen implements Screen, Serializable {
 
 		if (this.getFireStationTime()==170 && this.isSaving==false){
 		    this.isSaving=true;
-		    this.loadGame("08-03-2020-14-39-58");
+		    this.loadGame("10-03-2020-13-41-15");
         }
 
 
@@ -1254,35 +1256,21 @@ public class GameScreen implements Screen, Serializable {
 	 *  =======================================================================
 	 */
 
-	private void saveGame(){
+	private void saveGame()  {
 		GameSave gameSave = new GameSave();
-		ArrayList objects = new ArrayList<>();
+		// Create empty json for storing the json for each object
+		ArrayList masterObject = new ArrayList();
 
-//		private final ArrayList<ETFortress> ETFortresses;
-//		private final ArrayList<Projectile> projectiles;
-//		private final ArrayList<MinigameSprite> minigameSprites;
-//		private ArrayList<Projectile> projectilesToRemove;
-//		private final ArrayList<Patrol> ETPatrols;
-//		private final Firestation firestation;
-//		private final ArrayList<Texture> waterFrames;
-//		private final Texture projectileTexture;
-//		private ArrayList<Texture> patrolTextures;
-//		private int score;
-//		private int time;
+		Json masterJson = new Json();
 
-        // Create empty temporary array for storing the json for each object
-		ArrayList tmpArray = new ArrayList<>();
-
-		// Add ETFortresses to the objects array
-        Json obj = new Json();
-		tmpArray.add("ETFortresses");
 		// Iterate through ETFortresses and add them to temp array using the custom write and read methods
+		masterJson.setOutputType(JsonWriter.OutputType.minimal);
 		for (ETFortress e: ETFortresses)
-			tmpArray.add(obj.toJson(e));
-		objects.add(tmpArray);
+			masterObject.add(masterJson.toJson(e));
+
 
 		// Save to file
-		gameSave.saveGame(objects);
+		gameSave.saveGame(masterObject);
 
 	}
 
@@ -1290,39 +1278,54 @@ public class GameScreen implements Screen, Serializable {
         GameSave gameSave = new GameSave();
         System.out.println("loadingGame");
 
+        // Instantiate json classes to use
+        Json json  = new Json();
+        JsonReader reader = new JsonReader();
+
         // Load the file requested
-        ArrayList masterObjects = gameSave.loadGame(file);
-        // Iterate through the sets of objects
+		ArrayList masterObjects = gameSave.loadGame(file);
+
+		// Store etfortresses
+		ArrayList etf = new ArrayList();
+
+		// Iterate through all objects stored
+		for (Object object: masterObjects){
+			JsonValue jsonObject = reader.parse((String) object);
+
+			// Check the class of the objects
+			String objecClass = jsonObject.get("class").asString();
+			if (objecClass.contains("ETFortress")) etf.add(jsonObject);
 
 
-        for (Object objects: masterObjects){
-        	// Load the set of objects into arraylist
-			ArrayList<String> obs = (ArrayList)objects;
+		}
 
-			// Store the type to correctly replace the original objects
-			String currType ="";
+		loadFortresses(etf);
+	}
 
-			// Store items to replace the original store
-			ArrayList tempObjects = new ArrayList();
+	private void loadFortresses(ArrayList etfs){
+    	//ETFortress(Texture texture, Texture destroyedTexture, float scaleX, float scaleY, float xPos, float yPos, FortressType type, GameScreen gameScreen) {
+		ETFortresses = new ArrayList();
+		for (Object sEtf: etfs){
+			JsonValue etfObject = (JsonValue) sEtf;
+			FortressType ftype = null;
+			if (etfObject.get("fortressType").asString().contains("CLIFFORD")) ftype=CLIFFORD;
+			if (etfObject.get("fortressType").asString().contains("MINSTER")) ftype=MINSTER;
+			if (etfObject.get("fortressType").asString().contains("RAIL")) ftype=RAIL;
+			if (etfObject.get("fortressType").asString().contains("CASTLE1")) ftype=CASTLE1;
+			if (etfObject.get("fortressType").asString().contains("CASTLE2")) ftype=CASTLE2;
+			if (etfObject.get("fortressType").asString().contains("MOSSY")) ftype=MOSSY;
 
-			// Iterate through objects
-			for (int i = 0; i<obs.size();i++){
-        		String currOb = obs.get(i);
-				Json json = new Json();
-        		if (obs.get(0).equals("ETFortresses")) {
-					currType="ETFortress";
-					if (i>0){
-                        JsonReader jReader = new JsonReader();
-                        JsonValue object = jReader.parse(currOb);
-
-
-
-					}
-				}
-        	}
-			ETFortresses = tempObjects;
-
-
+			ETFortresses.add(
+					new ETFortress(
+							new Texture(etfObject.get("texture").asString()),
+							new Texture(etfObject.get("destroyedTexture").asString()),
+							etfObject.get("xScale").asFloat(),
+							etfObject.get("yScale").asFloat(),
+							etfObject.get("xPos").asFloat(),
+							etfObject.get("yPos").asFloat(),
+							ftype,
+							this
+					));
 		}
 
 	}
