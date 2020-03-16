@@ -120,10 +120,9 @@ public class Projectile extends MovementSprite  implements Json.Serializable {
         json.writeValue("xPos", this.getX());
         json.writeValue("yPos", this.getY());
         json.writeValue("damage", this.damage);
+        json.writeValue("class", Projectile.class.toString());
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData) {
-
-    }
+    public void read(Json json, JsonValue jsonData) { }
 }

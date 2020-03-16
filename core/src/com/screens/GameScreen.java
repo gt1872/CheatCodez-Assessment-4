@@ -78,11 +78,11 @@ public class GameScreen implements Screen, Serializable {
 	private float zoomTarget;
 
 	// Private sprite related objects
-	private ArrayList<ETFortress> ETFortresses;
-	private final ArrayList<Projectile> projectiles;
-	private final ArrayList<MinigameSprite> minigameSprites;
-	private ArrayList<Projectile> projectilesToRemove;
-	private final ArrayList<Patrol> ETPatrols;
+	private ArrayList<ETFortress> ETFortresses; //saved
+	private final ArrayList<Projectile> projectiles; //saved
+	private final ArrayList<MinigameSprite> minigameSprites; //saved
+	private ArrayList<Projectile> projectilesToRemove; //saved
+	private final ArrayList<Patrol> ETPatrols; //saved
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
 	private final Texture projectileTexture;
@@ -426,7 +426,7 @@ public class GameScreen implements Screen, Serializable {
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
 
-//		if (this.getFireStationTime()==178 && this.isSaving==false){
+//		if (this.getFireStationTime()==170 && this.isSaving==false){
 //
 //			this.isSaving=true;
 //			this.saveGame();
@@ -436,15 +436,8 @@ public class GameScreen implements Screen, Serializable {
 
 		if (this.getFireStationTime()==170 && this.isSaving==false){
 		    this.isSaving=true;
-		    this.loadGame("10-03-2020-13-41-15");
+		    this.loadGame("14-03-2020-19-14-23");
         }
-
-
-//		if (this.getFireStationTime()==170){
-//			for (ETFortress et: ETFortresses){
-//				et.getHealthBar().subtractResourceAmount(1);
-//			}
-//		}
 
 		if (DEBUG_ENABLED) {
 			this.fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
@@ -1263,11 +1256,24 @@ public class GameScreen implements Screen, Serializable {
 
 		Json masterJson = new Json();
 
+		// Remove projectiles that are needed to be removed
+		this.projectiles.removeAll(this.projectilesToRemove);
+
+
 		// Iterate through ETFortresses and add them to temp array using the custom write and read methods
 		masterJson.setOutputType(JsonWriter.OutputType.minimal);
+
 		for (ETFortress e: ETFortresses)
 			masterObject.add(masterJson.toJson(e));
 
+		for (Patrol p: ETPatrols)
+			masterObject.add(masterJson.toJson(p));
+
+		for (Projectile p: projectiles)
+			masterObject.add(masterJson.toJson(p));
+
+		for (MinigameSprite m: minigameSprites)
+			masterObject.add(masterJson.toJson(m));
 
 		// Save to file
 		gameSave.saveGame(masterObject);
@@ -1276,7 +1282,7 @@ public class GameScreen implements Screen, Serializable {
 
 	private void loadGame(String file){
         GameSave gameSave = new GameSave();
-        System.out.println("loadingGame");
+
 
         // Instantiate json classes to use
         Json json  = new Json();
@@ -1293,9 +1299,11 @@ public class GameScreen implements Screen, Serializable {
 			JsonValue jsonObject = reader.parse((String) object);
 
 			// Check the class of the objects
-			String objecClass = jsonObject.get("class").asString();
-			if (objecClass.contains("ETFortress")) etf.add(jsonObject);
-
+			String objectClass = jsonObject.get("class").asString();
+			if (objectClass.contains("ETFortress")) etf.add(jsonObject);
+			else {
+				System.out.println(objectClass);
+			}
 
 		}
 

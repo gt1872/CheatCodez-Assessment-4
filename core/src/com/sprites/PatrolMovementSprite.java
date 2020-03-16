@@ -24,6 +24,7 @@ public class PatrolMovementSprite extends SimpleSprite {
 
     // The mapGraph that contains all the junctions in the map
     final MapGraph mapGraph;
+
     // The road the patrol is currently travelling on
     Road setRoad;
 
@@ -42,6 +43,10 @@ public class PatrolMovementSprite extends SimpleSprite {
 
     // The junction that the patrol has just moved away from
     Junction previousJunction;
+
+    // Create attribute for start junction
+    Junction start;
+
     // Queue of junctions that the patrol will travel through to get
     // from its start position to it's goal position
     final Queue<Junction> pathQueue;
@@ -58,7 +63,7 @@ public class PatrolMovementSprite extends SimpleSprite {
         this.pathQueue = new Queue<>();
 
         // Generates a random start and end position each time you start the game
-        Junction start = mapGraph.getJunctions().random();
+        start = mapGraph.getJunctions().random();
         Junction goal = mapGraph.getJunctions().random();
 
         this.x = start.getX();
@@ -214,5 +219,15 @@ public class PatrolMovementSprite extends SimpleSprite {
     public Junction getGoal() {return this.pathQueue.last();}
 
     public PatrolMovementSprite getThis(){ return this; }
-    
+
+
+    /*
+     * ============================================
+     *          Added for Assessment 4
+     * ============================================
+     */
+
+    public Junction getStart(){ return start; }
+
+    public Road getRoad() { return setRoad; }
 }

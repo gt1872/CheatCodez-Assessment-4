@@ -9,13 +9,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants;
 
 /**
  * This sprite can be located around the map and when
  * a player drives over it, the mini game will begin
  */
-public class MinigameSprite extends Sprite {
+public class MinigameSprite extends Sprite implements Json.Serializable{
 
     // using polygon as firetruck is a polygon, which is what it collides with
     private final Polygon hitBox;
@@ -45,5 +47,23 @@ public class MinigameSprite extends Sprite {
 
     public Polygon getHitBox() {
         return this.hitBox;
+    }
+
+    /*
+        ========================================
+                Added for Assessment 4
+        ========================================
+
+     */
+    @Override
+    public void write(Json json) {
+        json.writeValue("xPos", getX());
+        json.writeValue("yPos", getY());
+        json.writeValue("class", MinigameSprite.class.toString());
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+
     }
 }

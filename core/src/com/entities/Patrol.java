@@ -142,25 +142,31 @@ public class Patrol extends PatrolMovementSprite implements Json.Serializable {
     }
 
     /*
-
         ===============================================
                      Added for Assessment 4
         ===============================================
      */
 
-    /**
-     *
-     * @param json
-     */
+
     @Override
     public void write(Json json) {
-
+        json.writeValue("dead", this.isDead);
+        json.writeValue("start", getStart().getName());
+        json.writeValue("goal", super.getGoal());
+        json.writeValue("xPos", getX());
+        json.writeValue("yPos", getY());
+        json.writeValue("roadTo", super.getRoad().getToNode().getName());
+        json.writeValue("roadFrom", super.getRoad().getFromNode().getName());
+        json.writeValue("rotation", this.getRotation());
+        json.writeValue("class", this.getClass().toString());
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData) {
+    public void read(Json json, JsonValue jsonData) { }
 
-    }
+    public void setDead(boolean v){ this.isDead = v; }
+
+
 }
 
 

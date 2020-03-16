@@ -74,6 +74,7 @@ public class Alien extends Sprite implements Json.Serializable {
         json.writeValue("score", type.getScore());
         json.writeValue("xPos", super.getX());
         json.writeValue("yPos", super.getY());
+        json.writeValue("class", Alien.class.toString());
 
     }
 
