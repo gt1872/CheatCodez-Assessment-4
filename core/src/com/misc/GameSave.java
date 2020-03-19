@@ -3,6 +3,7 @@ import com.Kroy;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import jdk.internal.vm.compiler.collections.EconomicMap;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -52,12 +53,12 @@ public class GameSave {
         return null;
     }
 
-    public void saveGame(ArrayList objects) {
+    public void saveGame(ArrayList objects, String file) {
 
         try {
             // Create filename of datetime
-            String filename = "./gamesaves/"+this.genSaveName();
-
+            String filename = "./gamesaves/"+file+"-"+this.genSaveName();
+            deleteOldSave(file);
             // Open/Create the new file save using OutputStream as we are writing
             FileOutputStream f = new FileOutputStream(new File(filename));
             ObjectOutputStream o = new ObjectOutputStream(f);
@@ -73,5 +74,45 @@ public class GameSave {
             // Output any errors
             System.out.println(e);
         }
+    }
+
+    public void deleteOldSave(String file){
+        String dirName = "./gamesaves/";
+
+        File fileName = new File(dirName);
+        File[] fileList = fileName.listFiles();
+        for (File f : fileList) {
+            if (f.getName().startsWith(file+"-")) {
+                f.delete();
+            }
+        }
+    }
+
+    public ArrayList<String> getSavedFiles(){
+        ArrayList<String> files = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            files.add("Empty");
+        }
+
+        String dirName = "./gamesaves/";
+
+        File fileName = new File(dirName);
+        File[] fileList = fileName.listFiles();
+
+        for (int f=0; f<5; f++){
+            try {
+                String fname = fileList[f].getName();
+                int saveNum = Integer.parseInt(fname.split("-")[0]);
+                files.remove(saveNum-1);
+                files.add(saveNum-1, fname);
+
+            } catch (Exception e){
+                System.out.println(e);
+            }
+        }
+
+
+        System.out.println(files);
+        return  files;
     }
 }

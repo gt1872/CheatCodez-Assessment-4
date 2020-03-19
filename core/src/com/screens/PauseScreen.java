@@ -95,12 +95,51 @@ public class PauseScreen implements Screen {
         Label timeLabel = new Label("Time: " + gameScreen.getFireStationTime(), new Label.LabelStyle(game.coolFont, Color.WHITE));
         timeLabel.setAlignment(Align.left);
 
+
+
         table.add(label).padBottom(20);
         table.row();
         table.add(resumeButton).width(200).height(40).padBottom(20);
         table.row();
         table.add(howToPlayButton).width(200).height(40).padBottom(20);
         table.row();
+
+        /*
+            ========================================
+                    Added for Assessment 4
+            ========================================
+
+         */
+
+        TextButton saveButton = new TextButton("Save Game", skin);
+        table.add(saveButton).width(200).height(40).padBottom(20);
+        table.row();
+
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                SFX.sfx_button_click.play();
+                game.setScreen(new SavesScreen(game, gameScreen, "save"));
+                dispose();
+            }
+        });
+
+        TextButton loadButton = new TextButton("Load Game", skin);
+        table.add(loadButton).width(200).height(40).padBottom(20);
+        table.row();
+
+        loadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                SFX.sfx_button_click.play();
+                game.setScreen(new SavesScreen(game, gameScreen, "load"));
+                dispose();
+            }
+        });
+
+        // ==============End of additions===============
+
+
         table.add(quitButton).width(200).height(40).padBottom(20);
         table.row();
         labels.add(scoreLabel).padRight(20);

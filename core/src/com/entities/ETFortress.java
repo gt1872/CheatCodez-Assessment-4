@@ -66,10 +66,15 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         super.resetRotation(90);
     }
 
-    /**
-     * Update the fortress so that it is drawn every frame.
-     * @param batch  The batch to draw onto.
-     */
+    public ETFortress(Texture texture, Texture destroyedTexture, float scaleX, float scaleY, float xPos, float yPos, FortressType type, GameScreen gameScreen, int health) {
+        this(texture, destroyedTexture, scaleX, scaleY, xPos, yPos, type, gameScreen);
+        this.getHealthBar().subtractResourceAmount(health);
+    }
+
+        /**
+         * Update the fortress so that it is drawn every frame.
+         * @param batch  The batch to draw onto.
+         */
     public void update(Batch batch) {
         super.update(batch);
         // If ETFortress is destroyed, change to flooded texture

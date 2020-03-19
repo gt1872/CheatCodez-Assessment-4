@@ -130,7 +130,6 @@ public class MainMenuScreen implements Screen {
 		buttonTable.row();
 		buttonTable.add(howToPlayButton).padBottom(20).width(200).height(40);
 		buttonTable.row();
-		buttonTable.add(quitButton).width(200).height(40);
 
 		// Add listeners
 		playButton.addListener(new ClickListener() {
@@ -150,6 +149,29 @@ public class MainMenuScreen implements Screen {
 			}
 		});
 
+
+		/*
+			=======================================
+					Added for Assessment 4
+			=======================================
+		 */
+
+		TextButton loadButton = new TextButton("Load Game", skin);
+		buttonTable.add(loadButton).width(200).height(40).padBottom(20);
+		buttonTable.row();
+
+		loadButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				SFX.sfx_button_click.play();
+				game.setScreen(new SavesScreen(game, new GameScreen(game), "load"));
+				dispose();
+			}
+		});
+
+		//================END of Additions==============
+		buttonTable.add(quitButton).width(200).height(40);
+
 		quitButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -157,6 +179,8 @@ public class MainMenuScreen implements Screen {
 				System.exit(1);
 			}
 		});
+
+
 
 		// Add table to stage
 		stage.addActor(bcgstack);

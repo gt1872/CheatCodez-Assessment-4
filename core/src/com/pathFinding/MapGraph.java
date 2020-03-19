@@ -174,4 +174,19 @@ public class MapGraph implements IndexedGraph<Junction> {
     @Override
     public int getNodeCount() { return lastNodeIndex; }
 
+
+    /*
+        ===============================================
+                    Added for Assessment 4
+        ===============================================
+     */
+
+    /**
+     *
+     *
+     * @param index
+     * @return
+     */
+    public Junction getJunction(int index) { return this.junctions.get(index); }
+
 }

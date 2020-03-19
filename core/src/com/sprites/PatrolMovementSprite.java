@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
 
+import java.util.ArrayList;
+
 /** This class is the super class for Patrol and is used to
  * move the patrol around the map. It extends SimpleSprite
  * which gives it a damageHitbox, healthbar and allows you
@@ -81,6 +83,39 @@ public class PatrolMovementSprite extends SimpleSprite {
         moving from (here it's it start junction) and the next junction it is moving to
         (here it's the first junction in pathQueue) */
         this.setRoad = mapGraph.getRoad(this.previousJunction, this.pathQueue.first());
+
+        /* Calls lockRoad in mapGraph which adds the road it is travelling on to the hashmap
+        lockedRoads in mapGraph so another patrol doesn't travel on this road at the same
+        time */
+        mapGraph.lockRoad(this.setRoad, this);
+    }
+
+
+    public PatrolMovementSprite(Texture spriteTexture, MapGraph mapGraph, Junction from, Junction to){
+        super(spriteTexture);
+
+        this.mapGraph = mapGraph;
+        this.pathQueue = new Queue<>();
+
+        // Generates a random start and end position each time you start the game
+        start = from;
+        Junction goal = to;
+
+
+        this.deltaX = 0f;
+        this.deltaY = 0f;
+        this.speed = 2.0f;
+        this.x = from.getX();
+        this.y = from.getY();
+        this.previousJunction = start;
+
+        setGoal(goal);
+
+        /* The road it is travelling on is the road between the junction it will start
+        moving from (here it's it start junction) and the next junction it is moving to
+        (here it's the first junction in pathQueue) */
+        this.setRoad = mapGraph.getRoad(this.previousJunction, this.pathQueue.first());
+        System.out.println(this.setRoad.getToNode().getName());
 
         /* Calls lockRoad in mapGraph which adds the road it is travelling on to the hashmap
         lockedRoads in mapGraph so another patrol doesn't travel on this road at the same
@@ -227,7 +262,13 @@ public class PatrolMovementSprite extends SimpleSprite {
      * ============================================
      */
 
-    public Junction getStart(){ return start; }
+    public int getStart(){ return start.getIndex(); }
 
     public Road getRoad() { return setRoad; }
+
+    public void setStart(Junction jStart){ this.start=jStart;}
+
+    public void setSetRoad(Road r) {this.setRoad=r; }
+
+    public Junction getPreviousJunction() {return this.previousJunction;}
 }

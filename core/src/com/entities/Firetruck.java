@@ -13,6 +13,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 // Custom class import
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants;
 import com.misc.Arrow;
 import com.misc.ResourceBar;
@@ -30,7 +32,7 @@ import static com.misc.Constants.*;
  * @author Archie
  * @since 16/12/2019
  */
-public class Firetruck extends MovementSprite implements Serializable {
+public class Firetruck extends MovementSprite implements Json.Serializable{
 
     // hose values
     private Boolean isSpraying;
@@ -89,7 +91,11 @@ public class Firetruck extends MovementSprite implements Serializable {
         this.carparkLayer = carparkLayer;
         this.isBought = isBought;
     }
-
+    public Firetruck(ArrayList<Texture> textureSlices, ArrayList<Texture> frames, TruckType type, TiledMapTileLayer collisionLayer, TiledMapTileLayer carparkLayer, Firestation fireStation, boolean isBought, int health, int water) {
+        this(textureSlices, frames, type, collisionLayer, carparkLayer, fireStation, isBought);
+        this.getHealthBar().subtractResourceAmount(health);
+        this.getWaterBar().subtractResourceAmount(water);
+    }
     /**
      * Sets the health of the firetruck and its size provided in CONSTANTS.
      * Also initialises any properties needed by the firetruck.
@@ -513,4 +519,30 @@ public class Firetruck extends MovementSprite implements Serializable {
             texture.dispose();
         }
     }
+
+
+
+
+    /*
+        ===============================================
+                    Added for Assessment 4
+        ===============================================
+    */
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("isBought", isBought);
+        json.writeValue("xPos", getX());
+        json.writeValue("yPos", getY());
+        json.writeValue("waterLevel", getWaterBar().getMaxAmount()-getWaterBar().getCurrentAmount());
+        json.writeValue("healthLevel", getHealthBar().getMaxAmount()-getHealthBar().getCurrentAmount());
+        json.writeValue("type", getType().getColourString());
+        json.writeValue("class", this.getClass().toString());
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {  }
+
+
+
 }

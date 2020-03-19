@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants;
+import com.pathFinding.Junction;
 import com.pathFinding.MapGraph;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.pathFinding.Road;
 import com.sprites.PatrolMovementSprite;
 
 import java.io.Serializable;
@@ -52,6 +54,17 @@ public class Patrol extends PatrolMovementSprite implements Json.Serializable {
         this.textureSlices = textureSlices;
         this.isDead = false;
         this.detectionRange = Constants.TILE_DIMS * 5;
+    }
+
+    public Patrol(ArrayList<Texture> textureSlices, MapGraph mapGraph, Junction from, Junction to){
+        super(textureSlices.get(textureSlices.size() - 1), mapGraph, from , to);
+
+        this.getHealthBar().setMaxResource(25);
+        this.textureSlices = textureSlices;
+        this.isDead = false;
+        this.detectionRange = Constants.TILE_DIMS * 5;
+
+
     }
 
     /** Called from gameScreen, first checks whether the patrol has
@@ -151,12 +164,12 @@ public class Patrol extends PatrolMovementSprite implements Json.Serializable {
     @Override
     public void write(Json json) {
         json.writeValue("dead", this.isDead);
-        json.writeValue("start", getStart().getName());
-        json.writeValue("goal", super.getGoal());
+        json.writeValue("start", getStart());
+        json.writeValue("goal", super.getGoal().getIndex());
         json.writeValue("xPos", getX());
         json.writeValue("yPos", getY());
-        json.writeValue("roadTo", super.getRoad().getToNode().getName());
-        json.writeValue("roadFrom", super.getRoad().getFromNode().getName());
+        json.writeValue("roadTo", super.getRoad().getToNode().getIndex());
+        json.writeValue("roadFrom", super.getRoad().getFromNode().getIndex());
         json.writeValue("rotation", this.getRotation());
         json.writeValue("class", this.getClass().toString());
     }

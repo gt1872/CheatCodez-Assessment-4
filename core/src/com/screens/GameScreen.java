@@ -48,6 +48,7 @@ import com.sprites.MinigameSprite;
 // Constants import
 import static com.misc.Constants.*;
 import static com.misc.Constants.FortressType.*;
+import static com.misc.Constants.TruckType.*;
 
 
 /**
@@ -56,7 +57,7 @@ import static com.misc.Constants.FortressType.*;
  * @author Archie
  * @since 23/11/2019
  */
-public class GameScreen implements Screen, Serializable {
+public class GameScreen implements Screen, Json.Serializable {
 
 	// A constant variable to store the game
 	final Kroy game;
@@ -79,10 +80,10 @@ public class GameScreen implements Screen, Serializable {
 
 	// Private sprite related objects
 	private ArrayList<ETFortress> ETFortresses; //saved
-	private final ArrayList<Projectile> projectiles; //saved
-	private final ArrayList<MinigameSprite> minigameSprites; //saved
+	private ArrayList<Projectile> projectiles; //saved
+	private ArrayList<MinigameSprite> minigameSprites; //saved
 	private ArrayList<Projectile> projectilesToRemove; //saved
-	private final ArrayList<Patrol> ETPatrols; //saved
+	private ArrayList<Patrol> ETPatrols; //saved
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
 	private final Texture projectileTexture;
@@ -111,7 +112,13 @@ public class GameScreen implements Screen, Serializable {
 	private final CarparkScreen carparkScreen;
 	private final GameInputHandler gameInputHandler;
 
+	/*
+		========================================
+				Added for Assessment 4
+		========================================
+	 */
 	private boolean isSaving=false;
+
 
 	/**
 	 * The constructor for the main game screen. All main game logic is
@@ -256,9 +263,9 @@ public class GameScreen implements Screen, Serializable {
 		// need to make it take away from  the number of points
 
 		// Initialise firetrucks array and add firetrucks to it
-		constructFireTruck(true, TruckType.RED);
-		constructFireTruck(false, TruckType.BLUE);
-		constructFireTruck(false, TruckType.YELLOW);
+		constructFireTruck(true, RED);
+		constructFireTruck(false, BLUE);
+		constructFireTruck(false, YELLOW);
 		constructFireTruck(false, TruckType.GREEN);
 
 		// Initialise ETFortresses array and add ETFortresses to it
@@ -302,10 +309,16 @@ public class GameScreen implements Screen, Serializable {
 			public void run() {
 				createPatrol();
 			}
-		}, 7,10);
+		}, 20,10);
 
 		isInTutorial = true;
 
+	}
+
+	public GameScreen(Kroy game, String gameload){
+		this(game);
+
+		loadGame(gameload);
 	}
 
 	/**
@@ -426,19 +439,6 @@ public class GameScreen implements Screen, Serializable {
 		this.scoreLabel.setText("Score: " + this.score);
 		this.timeLabel.setText("Time: " + this.getFireStationTime());
 
-//		if (this.getFireStationTime()==170 && this.isSaving==false){
-//
-//			this.isSaving=true;
-//			this.saveGame();
-//
-//		}
-
-
-		if (this.getFireStationTime()==170 && this.isSaving==false){
-		    this.isSaving=true;
-		    this.loadGame("14-03-2020-19-14-23");
-        }
-
 		if (DEBUG_ENABLED) {
 			this.fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
 		} else {
@@ -460,6 +460,7 @@ public class GameScreen implements Screen, Serializable {
 		checkIfGameOver();
 
 		checkIfCarpark();
+
 	}
 
 	/**
@@ -765,6 +766,7 @@ public class GameScreen implements Screen, Serializable {
 	 */
 	private void spawnPatrol() {
 		this.ETPatrols.add(new Patrol(this.patrolTextures, mapGraph));
+		System.out.println(this.ETPatrols);
 	}
 
 	/*
@@ -1249,10 +1251,15 @@ public class GameScreen implements Screen, Serializable {
 	 *  =======================================================================
 	 */
 
-	private void saveGame()  {
+	public ArrayList<String> getSavedFiles(){
+		GameSave gameSave = new GameSave();
+		return gameSave.getSavedFiles();
+	}
+
+	public void saveGame(String file)  {
 		GameSave gameSave = new GameSave();
 		// Create empty json for storing the json for each object
-		ArrayList masterObject = new ArrayList();
+		ArrayList<String> masterObject = new ArrayList();
 
 		Json masterJson = new Json();
 
@@ -1275,12 +1282,19 @@ public class GameScreen implements Screen, Serializable {
 		for (MinigameSprite m: minigameSprites)
 			masterObject.add(masterJson.toJson(m));
 
+
+		for (Firetruck f: firestation.getAllFireTrucks())
+			masterObject.add(masterJson.toJson(f));
+
+
+		masterObject.add(masterJson.toJson(this));
+
 		// Save to file
-		gameSave.saveGame(masterObject);
+		gameSave.saveGame(masterObject, file);
 
 	}
 
-	private void loadGame(String file){
+	public void loadGame(String file){
         GameSave gameSave = new GameSave();
 
 
@@ -1291,8 +1305,11 @@ public class GameScreen implements Screen, Serializable {
         // Load the file requested
 		ArrayList masterObjects = gameSave.loadGame(file);
 
-		// Store etfortresses
-		ArrayList etf = new ArrayList();
+		// Store different objects
+		ArrayList<JsonValue> etf = new ArrayList<>();
+        ArrayList<JsonValue> pats = new ArrayList<>();
+		ArrayList<JsonValue> fts = new ArrayList<>();
+		ArrayList<JsonValue> mgs = new ArrayList<>();
 
 		// Iterate through all objects stored
 		for (Object object: masterObjects){
@@ -1301,18 +1318,90 @@ public class GameScreen implements Screen, Serializable {
 			// Check the class of the objects
 			String objectClass = jsonObject.get("class").asString();
 			if (objectClass.contains("ETFortress")) etf.add(jsonObject);
+			else if (objectClass.contains("Patrol")) pats.add(jsonObject);
+			else if (objectClass.contains("Firetruck")) fts.add(jsonObject);
+			else if (objectClass.contains("generalValues")) loadGeneralValues(jsonObject);
+			else if (objectClass.contains("MinigameSprite")) mgs.add(jsonObject);
 			else {
 				System.out.println(objectClass);
 			}
-
 		}
 
 		loadFortresses(etf);
+		loadPats(pats);
+		loadFts(fts);
+		loadMgs(mgs);
+		this.projectiles=new ArrayList<>();
+		this.isInTutorial=false;
 	}
 
-	private void loadFortresses(ArrayList etfs){
+	private void loadMgs(ArrayList<JsonValue> mgs){
+		this.minigameSprites = new ArrayList<>();
+		for (Object mgsprite: mgs){
+			JsonValue mgObject = (JsonValue) mgsprite;
+
+			MinigameSprite f = new MinigameSprite(
+					mgObject.get("xPos").asInt(),
+					mgObject.get("yPos").asInt()
+			);
+			minigameSprites.add(f);
+		}
+
+	}
+
+	private void loadGeneralValues(JsonValue generalValues){
+		this.time=generalValues.get("time").asInt();
+	}
+
+	private void loadFts(ArrayList<JsonValue> fts) {
+		ArrayList<Firetruck> firetrucks = new ArrayList<>();
+		this.firestation.setFiretrucks(firetrucks);
+		for (Object firetruck: fts){
+			JsonValue firetruckObject = (JsonValue) firetruck;
+
+			TruckType type = null;
+			if (firetruckObject.get("type").asString().contains("Red")) type=RED;
+			if (firetruckObject.get("type").asString().contains("Blue")) type=BLUE;
+			if (firetruckObject.get("type").asString().contains("Yellow")) type=YELLOW;
+			if (firetruckObject.get("type").asString().contains("Green")) type=GREEN;
+
+			ArrayList<Texture> truckTextures = this.buildFiretuckTextures(type.getColourString());
+			Firetruck f = new Firetruck(truckTextures, this.waterFrames, type,
+					(TiledMapTileLayer) map.getLayers().get("Collision"), (TiledMapTileLayer) map.getLayers().get("Carpark"),
+					this.firestation, false, firetruckObject.get("healthLevel").asInt(), firetruckObject.get("waterLevel").asInt());
+
+
+			f.setX(firetruckObject.get("xPos").asInt());
+			f.setY(firetruckObject.get("yPos").asInt());
+			firetrucks.add(f);
+			this.firestation.setFiretrucks(firetrucks);
+			this.firestation.setActiveFireTruck(f);
+
+
+		}
+
+	}
+
+	private void loadPats(ArrayList<JsonValue> pats){
+        this.ETPatrols = new ArrayList<>();
+        for (Object sEtf: pats){
+            JsonValue patrolObject = (JsonValue) sEtf;
+            System.out.println(mapGraph.getJunction(patrolObject.get("roadFrom").asInt()).getX());
+
+            Patrol p = new Patrol(
+                            patrolTextures, mapGraph,
+							mapGraph.getJunction(patrolObject.get("roadFrom").asInt()),
+							mapGraph.getJunction(patrolObject.get("goal").asInt())
+                    );
+
+            p.setRotation(patrolObject.get("rotation").asFloat());
+			this.ETPatrols.add(p);
+        }
+    }
+
+	private void loadFortresses(ArrayList<JsonValue> etfs){
     	//ETFortress(Texture texture, Texture destroyedTexture, float scaleX, float scaleY, float xPos, float yPos, FortressType type, GameScreen gameScreen) {
-		ETFortresses = new ArrayList();
+		ETFortresses = new ArrayList<>();
 		for (Object sEtf: etfs){
 			JsonValue etfObject = (JsonValue) sEtf;
 			FortressType ftype = null;
@@ -1332,9 +1421,21 @@ public class GameScreen implements Screen, Serializable {
 							etfObject.get("xPos").asFloat(),
 							etfObject.get("yPos").asFloat(),
 							ftype,
-							this
+							this,
+							etfObject.get("health").asInt()
 					));
+
 		}
 
 	}
+
+	@Override
+	public void write(Json json) {
+		json.writeValue("activeFiretruck", this.firestation.getAllFireTrucks().size()-1);
+		json.writeValue("time", this.time);
+		json.writeValue("class", "generalValues");
+	}
+
+	@Override
+	public void read(Json json, JsonValue jsonData) {}
 }

@@ -27,7 +27,7 @@ public class Firestation extends SimpleSprite implements Serializable {
     private final GameScreen gameScreen;
 
     // list of fire trucks that are not the active truck
-    private final ArrayList<Firetruck> parkedFireTrucks;
+    private ArrayList<Firetruck> parkedFireTrucks;
 
     // fire truck that the user is currently controlling
     private Firetruck activeFireTruck;
@@ -270,5 +270,27 @@ public class Firestation extends SimpleSprite implements Serializable {
     public boolean isDestroyed() {
         return this.isDestroyed;
     }
+
+    /*
+        =======================================
+               Added for Assessment 4
+        =======================================
+
+     */
+    public ArrayList<Firetruck> getAllFireTrucks() {
+        ArrayList copy = this.parkedFireTrucks;
+        copy.add(copy.size(),this.activeFireTruck);
+        return copy;
+    }
+
+    public void setFiretrucks(ArrayList<Firetruck> fts) {
+        if (fts.size()>0){
+            this.activeFireTruck= fts.get(fts.size()-1);
+            fts.remove(fts.get(fts.size()-1));
+        }
+        this.parkedFireTrucks=fts;
+
+    }
+
 
 }

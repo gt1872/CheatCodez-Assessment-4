@@ -134,6 +134,8 @@ public class MinigameScreen implements Screen {
         canSpray = false;
 
         clicked = new Vector2();
+
+
     }
 
     @Override
@@ -164,6 +166,7 @@ public class MinigameScreen implements Screen {
 
         game.coolFont.draw(game.spriteBatch, "Minigame Score: " + score, 25, 100);
         game.coolFont.draw(game.spriteBatch, "Time Remaining: " + time, screenWidth - 250, 100);
+
 
         game.spriteBatch.end();
 
