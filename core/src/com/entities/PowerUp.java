@@ -23,7 +23,7 @@ public class PowerUp extends SimpleSprite {
         super(type.getTexture());
         this.setPosition(xPos, yPos);
         this.type = type;
-        this.setSize(FIRESTATION_WIDTH/2, FIRESTATION_WIDTH/2);
+        this.setSize(FIRESTATION_WIDTH/6, FIRESTATION_WIDTH/6);
         System.out.println("Created PowerUp at " + xPos + ", " +  yPos);
     }
 

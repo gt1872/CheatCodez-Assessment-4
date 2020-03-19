@@ -4,10 +4,7 @@ package com.screens;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.entities.Firestation;
@@ -60,6 +57,7 @@ public class GameScreen implements Screen {
 	// Private values for rendering
 	private final ShapeRenderer shapeRenderer;
 	private final OrthographicCamera camera;
+	private final OrthographicCamera hudCamera;
 	private final ShaderProgram vignetteSepiaShader;
 
 	// Private values for tiled map
@@ -125,7 +123,9 @@ public class GameScreen implements Screen {
 
 		// Create an orthographic camera
 		this.camera = new OrthographicCamera();
+		this.hudCamera = new OrthographicCamera();
 		this.camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		this.hudCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		// Zoom that the user has set with their scroll wheel
 		this.zoomTarget = 1.5f;
 		this.camera.zoom = 2f;
@@ -152,8 +152,6 @@ public class GameScreen implements Screen {
 		// Initialise map renderer as batch to draw textures to
 		this.game.setBatch(renderer.getBatch());
 
-		// Set the Batch to render in the coordinate system specified by the camera.
-		this.game.batch.setProjectionMatrix(this.camera.combined);
 
 		generateTutorial();
 
@@ -332,6 +330,9 @@ decreaseTime();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		// Set the Batch to render in the coordinate system specified by the camera.
+		this.game.batch.setProjectionMatrix(this.camera.combined);
+
 		vignetteSepiaShader.begin();
 		if (isInTutorial) {
 			vignetteSepiaShader.setUniformf("u_intensity", 0.8f);
@@ -446,6 +447,19 @@ decreaseTime();
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
+
+		// Set the Batch to render in the coordinate system specified by the HUD camera.
+		this.game.batch.setProjectionMatrix(this.hudCamera.combined);
+		game.batch.begin();
+		int count = 0;
+		stage.getBatch().begin();
+		for (PowerUp p : getActiveTruck().getPowerups()){
+			stage.getBatch().draw(p.getTexture(), 100 + 75 * count, 100, 50, 50);
+			count++;
+		}
+		stage.getBatch().end();
+		game.batch.end();
+
 		// Remove projectiles that are off the screen and firetrucks that are dead
 		this.projectiles.removeAll(this.projectilesToRemove);
 
@@ -465,6 +479,8 @@ decreaseTime();
 	public void resize(int width, int height) {
 		this.camera.viewportHeight = height;
 		this.camera.viewportWidth = width;
+		this.hudCamera.viewportHeight = height;
+		this.hudCamera.viewportWidth = width;
 		vignetteSepiaShader.begin();
 		vignetteSepiaShader.setUniformf("u_resolution", width, height);
 		vignetteSepiaShader.end();
@@ -620,8 +636,8 @@ decreaseTime();
 		// ==============================================================
 
 		for (PowerUp powerUp : powerUps){
-			if(powerUp.getDamageHitBox().contains(firetruck.getCentreX(),firetruck.getCentreY())){
-				firetruck.applyPowerUp(powerUp.getType());
+			if(powerUp.getDamageHitBox().contains(firetruck.getCentreX(),firetruck.getCentreY()) && firetruck.getType().getProperties()[8] > firetruck.getNumberOfPowerups() ){
+				firetruck.applyPowerUp(powerUp);
 				powerUpsToRemove.add(powerUp);
 			}
 		}
