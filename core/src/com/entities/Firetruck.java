@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 // Custom class import
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.misc.Constants;
@@ -100,10 +101,13 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         this.damageMultiplier = 1;
         this.rangeMultiplier  = 1;
     }
-    public Firetruck(ArrayList<Texture> textureSlices, ArrayList<Texture> frames, TruckType type, TiledMapTileLayer collisionLayer, TiledMapTileLayer carparkLayer, Firestation fireStation, boolean isBought, int health, int water) {
+
+    public Firetruck(ArrayList<Texture> textureSlices, ArrayList<Texture> frames, TruckType type, TiledMapTileLayer collisionLayer, TiledMapTileLayer carparkLayer, Firestation fireStation, boolean isBought, int health, int water, float rangeMultiplier, float damageMultiplier) {
         this(textureSlices, frames, type, collisionLayer, carparkLayer, fireStation, isBought);
         this.getHealthBar().subtractResourceAmount(health);
         this.getWaterBar().subtractResourceAmount(water);
+        this.rangeMultiplier=rangeMultiplier;
+        this.damageMultiplier=damageMultiplier;
     }
     /**
      * Sets the health of the firetruck and its size provided in CONSTANTS.
@@ -582,6 +586,18 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         json.writeValue("waterLevel", getWaterBar().getMaxAmount()-getWaterBar().getCurrentAmount());
         json.writeValue("healthLevel", getHealthBar().getMaxAmount()-getHealthBar().getCurrentAmount());
         json.writeValue("type", getType().getColourString());
+        json.writeValue("damagemult", damageMultiplier);
+        json.writeValue("rangemult", rangeMultiplier);
+
+        String[] tempPower = new String[5];
+        try{
+            for (int i=0;i<5;i++){
+                tempPower[i]=powerups.get(i).getType().getName();
+            }
+        } catch (Exception e){}
+
+
+        json.writeValue("powerups", tempPower);
         json.writeValue("class", this.getClass().toString());
     }
 

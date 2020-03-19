@@ -199,8 +199,10 @@ public class SavesScreen implements Screen {
                 if (action.equals("load")){
                     if (!savedGames.get(4).equals("Empty"))
                         gameScreen.loadGame(savedGames.get(4));}
-                else {gameScreen.saveGame("5");
-}
+                else {
+                    System.out.println("saving");
+                    gameScreen.saveGame("5");
+                }
                 gameScreen.resume();
                 game.setScreen(gameScreen);
                 dispose();

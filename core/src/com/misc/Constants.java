@@ -233,6 +233,8 @@ public final class Constants {
             this.texture = texture;
         }
 
+        public String getName() {return this.name();}
+
         public float getHealthMultiplier() {
             return healthMultiplier;
         }

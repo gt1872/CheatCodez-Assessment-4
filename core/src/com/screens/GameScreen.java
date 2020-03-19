@@ -79,13 +79,13 @@ public class GameScreen implements Screen, Json.Serializable {
 	private float zoomTarget;
 
 	// Private sprite related objects
-	private final ArrayList<ETFortress> ETFortresses;
+	private ArrayList<ETFortress> ETFortresses;
 	private final ArrayList<PowerUp> powerUps;
-	private final ArrayList<Projectile> projectiles;
-	private final ArrayList<MinigameSprite> minigameSprites;
+	private ArrayList<Projectile> projectiles;
+	private ArrayList<MinigameSprite> minigameSprites;
 	private ArrayList<Projectile> projectilesToRemove;
 	private ArrayList<PowerUp> powerUpsToRemove;
-	private final ArrayList<Patrol> ETPatrols;
+	private ArrayList<Patrol> ETPatrols;
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
 	private final Texture projectileTexture;
@@ -1418,11 +1418,27 @@ public class GameScreen implements Screen, Json.Serializable {
 			ArrayList<Texture> truckTextures = this.buildFiretuckTextures(type.getColourString());
 			Firetruck f = new Firetruck(truckTextures, this.waterFrames, type,
 					(TiledMapTileLayer) map.getLayers().get("Collision"), (TiledMapTileLayer) map.getLayers().get("Carpark"),
-					this.firestation, false, firetruckObject.get("healthLevel").asInt(), firetruckObject.get("waterLevel").asInt());
+					this.firestation, false, firetruckObject.get("healthLevel").asInt(), firetruckObject.get("waterLevel").asInt(),
+					firetruckObject.get("damagemult").asFloat(), firetruckObject.get("rangemult").asFloat()
+			);
 
 
 			f.setX(firetruckObject.get("xPos").asInt());
 			f.setY(firetruckObject.get("yPos").asInt());
+
+			System.out.println(firetruckObject.get("powerups"));
+			String[] powerups = firetruckObject.get("powerups").asStringArray();
+
+			for (String s: powerups) {
+				if (s!=null) {
+					if (s.equals("healthBoost")) f.applyPowerUp(new PowerUp(PowerUpType.healthBoost,f.getX(), f.getY()));
+					if (s.equals("omniBoost")) f.applyPowerUp(new PowerUp(PowerUpType.omniBoost,f.getX(), f.getY()));
+					if (s.equals("attackBoost")) f.applyPowerUp(new PowerUp(PowerUpType.attackBoost,f.getX(), f.getY()));
+					if (s.equals("speedBoost")) f.applyPowerUp(new PowerUp(PowerUpType.speedBoost,f.getX(), f.getY()));
+					if (s.equals("waterBoost")) f.applyPowerUp(new PowerUp(PowerUpType.waterBoost,f.getX(), f.getY()));
+				}
+			}
+
 			firetrucks.add(f);
 			this.firestation.setFiretrucks(firetrucks);
 			this.firestation.setActiveFireTruck(f);
