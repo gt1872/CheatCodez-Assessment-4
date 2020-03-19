@@ -24,6 +24,8 @@ import java.util.Iterator;
 
 import static com.misc.Constants.ETFORTRESS_HEIGHT;
 import static com.misc.Constants.ETFORTRESS_WIDTH;
+import static com.misc.Constants.*;
+
 
 /**
  * The ET Fortress implementation, a static sprite in the game.
@@ -62,7 +64,7 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
         this.setScale(scaleX, scaleY);
         this.setPosition(xPos, yPos);
         this.setSize(ETFORTRESS_WIDTH * this.getScaleX(), ETFORTRESS_HEIGHT * this.getScaleY());
-        this.getHealthBar().setMaxResource(type.getHealth());
+        this.getHealthBar().setMaxResource((int) (type.getHealth() * DIFFICULTY_MODIFIER));
         super.resetRotation(90);
     }
 

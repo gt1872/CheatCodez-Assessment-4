@@ -4,6 +4,10 @@ package com.pathFinding;
  *                  New class added for assessment 3
  *  ===============================================================*/
 
+import com.badlogic.gdx.graphics.Texture;
+import com.entities.PowerUp;
+import com.misc.Constants;
+
 public class Junction {
     final float x;
     final float y;
@@ -24,6 +28,29 @@ public class Junction {
         this.name = name;
     }
 
+    public PowerUp generatePowerUp(){
+        PowerUp powerup;
+        switch ((int)(Math.random() * 5)){
+            case 0:
+                powerup =  new PowerUp(Constants.PowerUpType.healthBoost,x,y);
+                break;
+            case 1:
+                powerup =  new  PowerUp(Constants.PowerUpType.omniBoost,x,y);
+                break;
+            case 2:
+                powerup =  new  PowerUp(Constants.PowerUpType.speedBoost,x,y);
+                break;
+            case 3:
+                powerup =  new  PowerUp(Constants.PowerUpType.waterBoost,x,y);
+                break;
+            case 4:
+                powerup =  new  PowerUp(Constants.PowerUpType.attackBoost,x,y);
+                break;
+            default:
+                powerup =  new PowerUp(Constants.PowerUpType.healthBoost,x,y);
+        }
+        return powerup;
+    }
 
     public void setIndex(int index){
         this.index = index;

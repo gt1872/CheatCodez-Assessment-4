@@ -19,6 +19,7 @@ import com.misc.Constants;
 import com.misc.Arrow;
 import com.misc.ResourceBar;
 import com.sprites.MovementSprite;
+import com.entities.PowerUp;
 
 // Java util import
 import java.io.Serializable;
@@ -29,7 +30,8 @@ import static com.misc.Constants.*;
 /**
  * The Firetruck implementation. A sprite capable of moving and colliding with other sprites.
  *
- * @author Archie
+ * 3@author Archie
+ *
  * @since 16/12/2019
  */
 public class Firetruck extends MovementSprite implements Json.Serializable{
@@ -58,10 +60,14 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
     private final TiledMapTileLayer carparkLayer;
     private CarparkEntrances location;
     private boolean isBought;
-
+    private float damageMultiplier;
+    private float rangeMultiplier;
     private boolean isAlive;
 
     private final Firestation fireStation;
+
+    private ArrayList<PowerUp> powerups;
+
 
     /**
      * Creates a firetruck capable of moving and colliding with the tiledMap and other sprites.
@@ -90,6 +96,9 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         this.isArrowVisible = false;
         this.carparkLayer = carparkLayer;
         this.isBought = isBought;
+        this.powerups = new ArrayList<>();
+        this.damageMultiplier = 1;
+        this.rangeMultiplier  = 1;
     }
     public Firetruck(ArrayList<Texture> textureSlices, ArrayList<Texture> frames, TruckType type, TiledMapTileLayer collisionLayer, TiledMapTileLayer carparkLayer, Firestation fireStation, boolean isBought, int health, int water) {
         this(textureSlices, frames, type, collisionLayer, carparkLayer, fireStation, isBought);
@@ -156,7 +165,8 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         Vector2 hoseVector = new Vector2((this.getCentreX() - (camera.viewportWidth / 2) + Gdx.input.getX()), (this.getCentreY() + (camera.viewportHeight / 2) - Gdx.input.getY()));
         Vector2 centreVector = new Vector2(this.getCentreX(), this.getCentreY());
 
-        // Work out the vector between them
+        // Work out the vector between themb
+
         hoseVector = hoseVector.sub(centreVector);
         hoseVector.nor();
 
@@ -179,7 +189,39 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         if (this.toggleDelay > 0) this.toggleDelay -= 1;
 
     }
+    /*
+     *  =======================================================================
+     *                          Added for Assessment 4
+     *  =======================================================================
+     */
+    public void applyPowerUp(PowerUp powerUp){
+        this.getHealthBar().setMaxResource((int) (this.getHealthBar().getMaxAmount() * powerUp.getType().getHealthMultiplier()));
+        this.getWaterBar().setMaxResource((int) (this.getHealthBar().getMaxAmount() * powerUp.getType().getWaterMultiplier()));
+        setMaxSpeed(getMaxSpeed() * powerUp.getType().getSpeedMultiplier());
+        damageMultiplier *= powerUp.getType().getDamageMultiplier();
+        rangeMultiplier *= powerUp.getType().getRangeMultiplier();
 
+
+        float rangeScale = this.getType().getProperties()[4] * rangeMultiplier;
+        this.hoseWidth = this.getHeight() * 4.5f * rangeScale;
+        this.hoseHeight = this.getWidth() * 0.65f * rangeScale;
+        float[] hoseVertices = { // Starts facing right
+                0, 0,
+                (hoseWidth * 0.5f), (hoseHeight / 2),
+                (hoseWidth * 0.9f), (hoseHeight / 2),
+                (hoseWidth), (hoseHeight / 2.25f),
+                (hoseWidth), -(hoseHeight / 2.25f),
+                (hoseWidth * 0.9f), -(hoseHeight / 2),
+                (hoseWidth * 0.5f), -(hoseHeight / 2)
+        };
+        this.hoseRange = new Polygon(hoseVertices);
+
+        powerups.add(powerUp);
+        this.getHealthBar().resetResourceAmount();
+    }
+    public int getNumberOfPowerups(){
+        return this.powerups.size();
+    }
     /**
      * Checks if the firetruck enters a car park, set the respawn location
      * of the fire truck to that car park and sets the menu to be opened
@@ -486,8 +528,10 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
         return this.getType().getProperties()[6];
     }
 
+
+    // 4 : returns base damage * multiplier by powerups
     public float getDamage() {
-        return this.getType().getProperties()[7];
+        return this.getType().getProperties()[7] * damageMultiplier;
     }
 
     public void buy() {
@@ -505,6 +549,7 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
     }
 
     public void setArrow(boolean b) {this.isArrowVisible = b;}
+
 
     /**
      * Dispose of all textures used by this class and its parents.
@@ -545,4 +590,7 @@ public class Firetruck extends MovementSprite implements Json.Serializable{
 
 
 
+    public ArrayList<PowerUp> getPowerups() {
+        return powerups;
+    }
 }

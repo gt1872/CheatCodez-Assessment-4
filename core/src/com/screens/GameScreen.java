@@ -4,10 +4,7 @@ package com.screens;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.entities.Firestation;
@@ -38,6 +35,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 // Class imports
 import com.entities.*;
@@ -65,6 +63,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	// Private values for rendering
 	private final ShapeRenderer shapeRenderer;
 	private final OrthographicCamera camera;
+	private final OrthographicCamera hudCamera;
 	private final ShaderProgram vignetteSepiaShader;
 
 	// Private values for tiled map
@@ -76,14 +75,17 @@ public class GameScreen implements Screen, Json.Serializable {
 	// Private values for the game
 	private int score;
 	private int time;
+	private int powerUpTime;
 	private float zoomTarget;
 
 	// Private sprite related objects
-	private ArrayList<ETFortress> ETFortresses; //saved
-	private ArrayList<Projectile> projectiles; //saved
-	private ArrayList<MinigameSprite> minigameSprites; //saved
-	private ArrayList<Projectile> projectilesToRemove; //saved
-	private ArrayList<Patrol> ETPatrols; //saved
+	private final ArrayList<ETFortress> ETFortresses;
+	private final ArrayList<PowerUp> powerUps;
+	private final ArrayList<Projectile> projectiles;
+	private final ArrayList<MinigameSprite> minigameSprites;
+	private ArrayList<Projectile> projectilesToRemove;
+	private ArrayList<PowerUp> powerUpsToRemove;
+	private final ArrayList<Patrol> ETPatrols;
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
 	private final Texture projectileTexture;
@@ -106,6 +108,7 @@ public class GameScreen implements Screen, Json.Serializable {
 
 	// timers to manage timed events
 	private final Timer popupTimer;
+	private final Timer powerUpTimer;
 	private final Timer firestationTimer;
 	private final Timer ETPatrolsTimer;
 
@@ -134,7 +137,9 @@ public class GameScreen implements Screen, Json.Serializable {
 
 		// Create an orthographic camera
 		this.camera = new OrthographicCamera();
+		this.hudCamera = new OrthographicCamera();
 		this.camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		this.hudCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		// Zoom that the user has set with their scroll wheel
 		this.zoomTarget = 1.5f;
 		this.camera.zoom = 2f;
@@ -150,10 +155,10 @@ public class GameScreen implements Screen, Json.Serializable {
 
 		// Create an array to store all projectiles in motion
 		this.projectiles = new ArrayList<>();
-
+		this.powerUps = new ArrayList<>();
 		// Decrease time every second, starting at 3 minutes
 		this.time = TIME_STATION_VULNERABLE;
-
+		this.powerUpTime = POWERUP_SPAWN_TIME;
 		gameInputHandler = new GameInputHandler(this);
 
 		// ---- 2) Initialise and set game properties ----------------------------- //
@@ -161,8 +166,6 @@ public class GameScreen implements Screen, Json.Serializable {
 		// Initialise map renderer as batch to draw textures to
 		this.game.setBatch(renderer.getBatch());
 
-		// Set the Batch to render in the coordinate system specified by the camera.
-		this.game.batch.setProjectionMatrix(this.camera.combined);
 
 		generateTutorial();
 
@@ -276,9 +279,10 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.ETFortresses.add(new ETFortress(castle2Texture, castle2WetTexture, 2, 2, 10 * TILE_DIMS, TILE_DIMS, CASTLE2, this));
 		this.ETFortresses.add(new ETFortress(castle1Texture, castle1WetTexture, 2, 2, 98 * TILE_DIMS, TILE_DIMS, FortressType.CASTLE1, this));
 		this.ETFortresses.add(new ETFortress(mossyTexture, mossyWetTexture, 1.5f, 1.5f, 106 * TILE_DIMS, 101 * TILE_DIMS, FortressType.MOSSY, this));
-
+		decreaseTime();
 		// Create array to collect entities that are no longer used
 		this.projectilesToRemove = new ArrayList<Projectile>();
+		this.powerUpsToRemove = new ArrayList<PowerUp>();
 
 		this.junctionsInMap = new ArrayList<>();
 		mapGraph = new MapGraph();
@@ -292,7 +296,13 @@ public class GameScreen implements Screen, Json.Serializable {
 			}
 		}, 1, 1);
 		firestationTimer.stop();
-
+		powerUpTimer = new Timer();
+		powerUpTimer.scheduleTask(new Task() {
+			@Override
+			public void run() {
+				decreasePowerUpTimer();
+			}
+		}, 1, 1);
 		popupTimer = new Timer();
 		popupTimer.scheduleTask(new Task() {
 			@Override
@@ -331,6 +341,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.camera.position.set(this.firestation.getActiveFireTruck().getCentreX(), this.firestation.getActiveFireTruck().getCentreY(), 0);
 		// Create array to collect entities that are no longer used
 		this.projectilesToRemove = new ArrayList<Projectile>();
+		this.powerUpsToRemove =  new ArrayList<PowerUp>();
 		Gdx.input.setInputProcessor(gameInputHandler);
 	}
 
@@ -341,10 +352,12 @@ public class GameScreen implements Screen, Json.Serializable {
 	 */
 	@Override
 	public void render(float delta) {
-
 		// MUST BE FIRST: Clear the screen each frame to stop textures blurring
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		// Set the Batch to render in the coordinate system specified by the camera.
+		this.game.batch.setProjectionMatrix(this.camera.combined);
 
 		vignetteSepiaShader.begin();
 		if (isInTutorial) {
@@ -368,7 +381,6 @@ public class GameScreen implements Screen, Json.Serializable {
 
 		// Get the firetruck thats being driven so that the camera can follow it
 		Firetruck focusedTruck = this.firestation.getActiveFireTruck();
-
 		// ==============================================================
 		//					Modified for assessment 3
 		// ==============================================================
@@ -407,6 +419,9 @@ public class GameScreen implements Screen, Json.Serializable {
 			ETFortress.update(this.game.batch);
 			if (DEBUG_ENABLED) ETFortress.drawDebug(shapeRenderer);
 		}
+		for (PowerUp powerUp : this.powerUps){
+			powerUp.update(this.game.batch);
+		}
 		for (Projectile projectile : this.projectiles) {
 			projectile.update(this.game.batch);
 			if (DEBUG_ENABLED) projectile.drawDebug(shapeRenderer);
@@ -422,7 +437,7 @@ public class GameScreen implements Screen, Json.Serializable {
 			if (DEBUG_ENABLED) patrol.drawDebug(shapeRenderer);
 		}
 
-		// Render mini game sprites
+		// Render mini game spritesdecreasePowerUpTimer
 		for (MinigameSprite minigameSprite : minigameSprites) {
 			minigameSprite.update(this.game.batch);
 		}
@@ -430,6 +445,12 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.firestation.update(this.game.batch);
 
 		if (DEBUG_ENABLED) firestation.drawDebug(shapeRenderer);
+
+		if(powerUpTime <= 0){
+			powerUpTime = POWERUP_SPAWN_TIME;
+			Random rand = new Random();
+			powerUps.add(mapGraph.getJunctions().get(rand.nextInt(mapGraph.getJunctions().size - 1)).generatePowerUp());
+		}
 
 		// Finish rendering
 		this.game.batch.end();
@@ -453,12 +474,26 @@ public class GameScreen implements Screen, Json.Serializable {
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
+
+		// Set the Batch to render in the coordinate system specified by the HUD camera.
+		this.game.batch.setProjectionMatrix(this.hudCamera.combined);
+		game.batch.begin();
+		int count = 0;
+		stage.getBatch().begin();
+		for (PowerUp p : getActiveTruck().getPowerups()){
+			stage.getBatch().draw(p.getTexture(), 100 + 75 * count, 100, 50, 50);
+			count++;
+		}
+		stage.getBatch().end();
+		game.batch.end();
+
 		// Remove projectiles that are off the screen and firetrucks that are dead
 		this.projectiles.removeAll(this.projectilesToRemove);
 
+		this.powerUps.removeAll(this.powerUpsToRemove);
+
 		// Check if the game should end
 		checkIfGameOver();
-
 		checkIfCarpark();
 
 	}
@@ -472,6 +507,8 @@ public class GameScreen implements Screen, Json.Serializable {
 	public void resize(int width, int height) {
 		this.camera.viewportHeight = height;
 		this.camera.viewportWidth = width;
+		this.hudCamera.viewportHeight = height;
+		this.hudCamera.viewportWidth = width;
 		vignetteSepiaShader.begin();
 		vignetteSepiaShader.setUniformf("u_resolution", width, height);
 		vignetteSepiaShader.end();
@@ -560,7 +597,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		}
 	}
 
-	/*
+	/*decreasePowerUpTimer
 	 *  =======================================================================
 	 *                          Added for Assessment 3
 	 *  =======================================================================
@@ -615,10 +652,21 @@ public class GameScreen implements Screen, Json.Serializable {
 				this.score += 10;
 			}
 			if (ETFortress.isInRadius(firetruck.getCentre()) && ETFortress.canShootProjectile()) {
-				Projectile projectile = new Projectile(this.projectileTexture, ETFortress.getCentreX(), ETFortress.getCentreY(), ETFortress.getType().getDamage());
+				Projectile projectile = new Projectile(this.projectileTexture, ETFortress.getCentreX(), ETFortress.getCentreY(), (int) (ETFortress.getType().getDamage() * DIFFICULTY_MODIFIER));
 				projectile.calculateTrajectory(firetruck);
 				SFX.sfx_projectile.play();
 				this.projectiles.add(projectile);
+			}
+		}
+
+		// ==============================================================
+		//					Added for assessment 4
+		// ==============================================================
+
+		for (PowerUp powerUp : powerUps){
+			if(powerUp.getDamageHitBox().contains(firetruck.getCentreX(),firetruck.getCentreY()) && firetruck.getType().getProperties()[8] > firetruck.getNumberOfPowerups() ){
+				firetruck.applyPowerUp(powerUp);
+				powerUpsToRemove.add(powerUp);
 			}
 		}
 
@@ -697,7 +745,9 @@ public class GameScreen implements Screen, Json.Serializable {
 	private void decreaseTime() {
 		this.time -= 1;
 	}
-
+	private void decreasePowerUpTimer(){
+		this.powerUpTime -= 1;
+	}
 	/*
 	 *  =======================================================================
 	 *                          Modified for Assessment 3

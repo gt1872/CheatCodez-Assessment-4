@@ -31,6 +31,7 @@ public class Kroy extends Game {
   	public Batch batch;
   	public SpriteBatch spriteBatch;
 	public BitmapFont coolFont;
+	public float difficultyModifier;
 	private Label.LabelStyle font10;
 	private Skin skin;
 

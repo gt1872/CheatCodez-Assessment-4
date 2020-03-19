@@ -50,7 +50,7 @@ public class Patrol extends PatrolMovementSprite implements Json.Serializable {
      */
     public Patrol(ArrayList<Texture> textureSlices, MapGraph mapGraph){
         super(textureSlices.get(textureSlices.size() - 1), mapGraph);
-        this.getHealthBar().setMaxResource(25);
+        this.getHealthBar().setMaxResource((int) (25 * Constants.DIFFICULTY_MODIFIER));
         this.textureSlices = textureSlices;
         this.isDead = false;
         this.detectionRange = Constants.TILE_DIMS * 5;
