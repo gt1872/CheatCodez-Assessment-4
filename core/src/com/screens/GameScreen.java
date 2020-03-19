@@ -327,7 +327,7 @@ public class GameScreen implements Screen, Json.Serializable {
 
 	public GameScreen(Kroy game, String gameload){
 		this(game);
-
+		this.isInTutorial=false;
 		loadGame(gameload);
 	}
 

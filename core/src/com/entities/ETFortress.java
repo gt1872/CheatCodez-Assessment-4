@@ -71,6 +71,7 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
     public ETFortress(Texture texture, Texture destroyedTexture, float scaleX, float scaleY, float xPos, float yPos, FortressType type, GameScreen gameScreen, int health) {
         this(texture, destroyedTexture, scaleX, scaleY, xPos, yPos, type, gameScreen);
         this.getHealthBar().subtractResourceAmount(health);
+        System.out.println(this.getHealthBar().getCurrentAmount());
     }
 
         /**
@@ -157,7 +158,7 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
     public void write(Json json) {
         json.writeValue("flooded", flooded);
         json.writeValue("fortressType", type.getStatus());
-        json.writeValue("health", type.getHealth()-this.getHealthBar().getCurrentAmount());
+        json.writeValue("health", this.getHealthBar().getMaxAmount()-this.getHealthBar().getCurrentAmount());
         json.writeValue("xPos", this.getX());
         json.writeValue("yPos", this.getY());
         json.writeValue("texture", this.getTexture().toString());
