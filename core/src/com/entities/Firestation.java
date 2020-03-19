@@ -188,7 +188,10 @@ public class Firestation extends SimpleSprite implements Serializable {
             }
         }
         for (Firetruck firetruck : parkedFireTrucks) {
+
             if (!isDestroyed && firetruck.getCarpark().name().contains("Main") && (firetruck.isDamaged() || firetruck.isLowOnWater())) {
+                System.out.println("checking refill");
+
                 this.repairRefill(firetruck);
             }
         }

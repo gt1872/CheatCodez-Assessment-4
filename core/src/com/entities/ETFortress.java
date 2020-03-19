@@ -147,13 +147,6 @@ public class ETFortress extends SimpleSprite implements Json.Serializable {
 
      */
 
-    public ETFortress(){
-        super(new Texture("MapAssets/UniqueBuildings/Yorkminster_wet.png"));
-
-    }
-
-
-
     @Override
     public void write(Json json) {
         json.writeValue("flooded", flooded);

@@ -735,6 +735,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		}
 		/* Check if it is in the firestation's radius. Only repair the truck if it needs repairing.
 		Allows multiple trucks to be in the radius and be repaired or refilled every second.*/
+
 		this.firestation.checkRepairRefill(this.time, false);
 
 	}
@@ -1333,7 +1334,7 @@ public class GameScreen implements Screen, Json.Serializable {
 			masterObject.add(masterJson.toJson(m));
 
 
-		for (Firetruck f: firestation.getAllFireTrucks())
+		for (Firetruck f: firestation.getParkedFireTrucks())
 			masterObject.add(masterJson.toJson(f));
 
 
@@ -1360,7 +1361,7 @@ public class GameScreen implements Screen, Json.Serializable {
         ArrayList<JsonValue> pats = new ArrayList<>();
 		ArrayList<JsonValue> fts = new ArrayList<>();
 		ArrayList<JsonValue> mgs = new ArrayList<>();
-
+		JsonValue general = null;
 		// Iterate through all objects stored
 		for (Object object: masterObjects){
 			JsonValue jsonObject = reader.parse((String) object);
@@ -1370,7 +1371,7 @@ public class GameScreen implements Screen, Json.Serializable {
 			if (objectClass.contains("ETFortress")) etf.add(jsonObject);
 			else if (objectClass.contains("Patrol")) pats.add(jsonObject);
 			else if (objectClass.contains("Firetruck")) fts.add(jsonObject);
-			else if (objectClass.contains("generalValues")) loadGeneralValues(jsonObject);
+			else if (objectClass.contains("generalValues")) general=jsonObject;
 			else if (objectClass.contains("MinigameSprite")) mgs.add(jsonObject);
 			else {
 				System.out.println(objectClass);
@@ -1381,6 +1382,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		loadPats(pats);
 		loadFts(fts);
 		loadMgs(mgs);
+		loadGeneralValues(general);
 		this.projectiles=new ArrayList<>();
 		this.isInTutorial=false;
 	}
@@ -1400,7 +1402,10 @@ public class GameScreen implements Screen, Json.Serializable {
 	}
 
 	private void loadGeneralValues(JsonValue generalValues){
+		Firetruck f = loadFt(generalValues.get("activeFiretruck"));
+		this.firestation.setActiveFireTruck(f);
 		this.time=generalValues.get("time").asInt();
+
 	}
 
 	private void loadFts(ArrayList<JsonValue> fts) {
@@ -1409,43 +1414,45 @@ public class GameScreen implements Screen, Json.Serializable {
 		for (Object firetruck: fts){
 			JsonValue firetruckObject = (JsonValue) firetruck;
 
-			TruckType type = null;
-			if (firetruckObject.get("type").asString().contains("Red")) type=RED;
-			if (firetruckObject.get("type").asString().contains("Blue")) type=BLUE;
-			if (firetruckObject.get("type").asString().contains("Yellow")) type=YELLOW;
-			if (firetruckObject.get("type").asString().contains("Green")) type=GREEN;
-
-			ArrayList<Texture> truckTextures = this.buildFiretuckTextures(type.getColourString());
-			Firetruck f = new Firetruck(truckTextures, this.waterFrames, type,
-					(TiledMapTileLayer) map.getLayers().get("Collision"), (TiledMapTileLayer) map.getLayers().get("Carpark"),
-					this.firestation, false, firetruckObject.get("healthLevel").asInt(), firetruckObject.get("waterLevel").asInt(),
-					firetruckObject.get("damagemult").asFloat(), firetruckObject.get("rangemult").asFloat()
-			);
-
-
-			f.setX(firetruckObject.get("xPos").asInt());
-			f.setY(firetruckObject.get("yPos").asInt());
-
-			System.out.println(firetruckObject.get("powerups"));
-			String[] powerups = firetruckObject.get("powerups").asStringArray();
-
-			for (String s: powerups) {
-				if (s!=null) {
-					if (s.equals("healthBoost")) f.applyPowerUp(new PowerUp(PowerUpType.healthBoost,f.getX(), f.getY()));
-					if (s.equals("omniBoost")) f.applyPowerUp(new PowerUp(PowerUpType.omniBoost,f.getX(), f.getY()));
-					if (s.equals("attackBoost")) f.applyPowerUp(new PowerUp(PowerUpType.attackBoost,f.getX(), f.getY()));
-					if (s.equals("speedBoost")) f.applyPowerUp(new PowerUp(PowerUpType.speedBoost,f.getX(), f.getY()));
-					if (s.equals("waterBoost")) f.applyPowerUp(new PowerUp(PowerUpType.waterBoost,f.getX(), f.getY()));
-				}
-			}
+			Firetruck f = loadFt(firetruckObject);
 
 			firetrucks.add(f);
 			this.firestation.setFiretrucks(firetrucks);
-			this.firestation.setActiveFireTruck(f);
-
-
 		}
 
+	}
+
+	private Firetruck loadFt(JsonValue firetruckObject){
+		TruckType type = null;
+		System.out.println(firetruckObject.get("type").asString());
+		if (firetruckObject.get("type").asString().equals("Red")) type=RED;
+		else if (firetruckObject.get("type").asString().equals("Blue")) type=BLUE;
+		else if (firetruckObject.get("type").asString().equals("Yellow")) type=YELLOW;
+		else if (firetruckObject.get("type").asString().equals("Green")) type=GREEN;
+
+		ArrayList<Texture> truckTextures = this.buildFiretuckTextures(type.getColourString());
+		Firetruck f = new Firetruck(truckTextures, this.waterFrames, type,
+				(TiledMapTileLayer) map.getLayers().get("Collision"), (TiledMapTileLayer) map.getLayers().get("Carpark"),
+				this.firestation, false, firetruckObject.get("healthLevel").asInt(), firetruckObject.get("waterLevel").asInt(),
+				firetruckObject.get("damagemult").asFloat(), firetruckObject.get("rangemult").asFloat()
+		);
+
+
+		f.setX(firetruckObject.get("xPos").asInt());
+		f.setY(firetruckObject.get("yPos").asInt());
+
+		String[] powerups = firetruckObject.get("powerups").asStringArray();
+
+		for (String s: powerups) {
+			if (s!=null) {
+				if (s.equals("healthBoost")) f.applyPowerUp(new PowerUp(PowerUpType.healthBoost,f.getX(), f.getY()));
+				if (s.equals("omniBoost")) f.applyPowerUp(new PowerUp(PowerUpType.omniBoost,f.getX(), f.getY()));
+				if (s.equals("attackBoost")) f.applyPowerUp(new PowerUp(PowerUpType.attackBoost,f.getX(), f.getY()));
+				if (s.equals("speedBoost")) f.applyPowerUp(new PowerUp(PowerUpType.speedBoost,f.getX(), f.getY()));
+				if (s.equals("waterBoost")) f.applyPowerUp(new PowerUp(PowerUpType.waterBoost,f.getX(), f.getY()));
+			}
+		}
+		return f;
 	}
 
 	private void loadPats(ArrayList<JsonValue> pats){
@@ -1497,7 +1504,7 @@ public class GameScreen implements Screen, Json.Serializable {
 
 	@Override
 	public void write(Json json) {
-		json.writeValue("activeFiretruck", this.firestation.getAllFireTrucks().size()-1);
+		json.writeValue("activeFiretruck", this.firestation.getActiveFireTruck());
 		json.writeValue("time", this.time);
 		json.writeValue("class", "generalValues");
 	}
