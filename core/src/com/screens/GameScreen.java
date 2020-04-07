@@ -42,7 +42,7 @@ import com.entities.*;
 import com.Kroy;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 import com.sprites.MinigameSprite;
-
+import com.misc.Achievement;
 // Constants import
 import static com.misc.Constants.*;
 import static com.misc.Constants.FortressType.*;
@@ -86,6 +86,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	private ArrayList<Projectile> projectilesToRemove;
 	private ArrayList<PowerUp> powerUpsToRemove;
 	private ArrayList<Patrol> ETPatrols;
+	private ArrayList<Achievement> achievements;
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
 	private final Texture projectileTexture;
@@ -321,6 +322,8 @@ public class GameScreen implements Screen, Json.Serializable {
 			}
 		}, 20,10);
 
+		this.achievements = new ArrayList<>();
+		
 		isInTutorial = true;
 
 	}
@@ -471,6 +474,9 @@ public class GameScreen implements Screen, Json.Serializable {
 
 		// ---- 4) Perform any calulcation needed after sprites are drawn - //
 
+		//update achievements -- added for section 4
+		updateAchievements();
+		
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
@@ -1270,6 +1276,16 @@ public class GameScreen implements Screen, Json.Serializable {
 	private float calculateValueForProgress(float start, float end) {
 		float progress = (float) getETFortressesDestroyed()[0] / (float) getETFortressesDestroyed()[1];
 		return start - (progress*(start-end));
+	}
+	
+	/*
+	 *  =======================================================================
+	 *                          Added for Assessment 4
+	 *  =======================================================================
+	 */
+	void updateAchievements(){
+		for(Achievement achievement: achievements){
+			achievement.update(this);
 	}
 
 	/**
