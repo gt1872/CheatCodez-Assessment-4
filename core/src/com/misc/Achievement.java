@@ -80,6 +80,7 @@ public class Achievement {
     }
 
     public void update(GameScreen gameScreen){
+
         if(!complete) {
             if (evaluateAchievement(gameScreen)) {
                 gameScreen.setScore(gameScreen.getScore() + scoreValue);
@@ -105,13 +106,20 @@ public class Achievement {
 
 
     public String getStatusMessage(int currentTime){
-        String s= "";
-        s+="Kill " + this.goalValue;
-        s+= this.type==0 ? " patrols" : " fortresses";
-        String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf((this.timeAtFirstValue - currentTime));
-        s+=" in "+ seconds + " seconds";
-
-        return s;
+        if (!complete){
+            String s= "";
+            s+="Kill " + this.goalValue;
+            s+= this.type==0 ? " fortresses " : " patrols ";
+            String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
+            s+=" in "+ seconds + " seconds";
+            return s;
+        } else if (timeCondition-(this.timeAtFirstValue - currentTime)<1){
+            return "FAILED MISSION!";
+        } else {
+            return null;
+        }
     }
+
+    public boolean isComplete() {return this.complete;}
 
 }

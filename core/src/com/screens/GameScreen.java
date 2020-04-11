@@ -509,8 +509,11 @@ public class GameScreen implements Screen, Json.Serializable {
 		checkIfCarpark();
 
 
-
-		this.achieveLabel.setText(achievements.get(0).getStatusMessage(this.getTime()));
+		if (!achievements.get(0).isComplete()){
+			this.achieveLabel.setText(achievements.get(0).getStatusMessage(this.getTime()));
+		} else {
+			this.achieveLabel.setText("SUCCESSFULLY COMPLETED MISSION!");
+		}
 
 
 	}
