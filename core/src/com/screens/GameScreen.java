@@ -329,7 +329,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		}, 20,10);
 
 		this.achievements = new ArrayList<>();
-		achievements.add(new Achievement("Kill 5 in 30 seconds", 5, 500, 1, 30));
+		this.achievements.add(new Achievement("Kill 3 Patrols in 100 seconds",3,10,1, 100));
 		isInTutorial = true;
 
 	}
@@ -509,7 +509,8 @@ public class GameScreen implements Screen, Json.Serializable {
 		checkIfCarpark();
 
 
-		this.achieveLabel.setText(achievements.get(0).getStatusMessage());
+
+		this.achieveLabel.setText(achievements.get(0).getStatusMessage(this.getTime()));
 
 
 	}

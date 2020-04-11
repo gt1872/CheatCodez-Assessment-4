@@ -15,8 +15,8 @@ public class Achievement {
 
     private Integer type;
     /**
-        1 - No. of Alien Kills
-        2 - No. of Fortresses Destroyed
+     1 - No. of Alien Kills
+     2 - No. of Fortresses Destroyed
      */
     private String name;
 
@@ -26,7 +26,7 @@ public class Achievement {
     private boolean complete;
 
     private Integer timeCondition;
-    private Integer timeAtLastValue;
+    private Integer timeAtFirstValue;
 
     private int scoreValue;
 
@@ -46,21 +46,20 @@ public class Achievement {
         this.timeCondition = null;
     }
 
-    public void checkCondition(int gameTime){
+    void checkCondition(int gameTime){
         if (timeCondition == null) { //if no time condition
             currentValue++; //then increase the value
         }
-        else if (timeAtLastValue == null) { //if there is a time condition but this is the first kill
+        else if (timeAtFirstValue == null) { //if there is a time condition but this is the first kill
             currentValue++; //then increase the value
-            timeAtLastValue = gameTime; //update time counter
+            timeAtFirstValue = gameTime; //update time counter
         }
-        else if (timeCondition >= (gameTime - timeAtLastValue)) {//if there's a time condition and it is met
+        else if (timeCondition >= (gameTime - timeAtFirstValue)) {//if there's a time condition and it is met
             currentValue++; //then increase the value
-            timeAtLastValue = gameTime; // update time counter
         }
         else{ //if the time condition isn't met
             currentValue = 1; //then reset the value
-            timeAtLastValue = gameTime; //update current time counter
+            timeAtFirstValue = gameTime; //update current time counter
         }
     }
 
@@ -84,7 +83,8 @@ public class Achievement {
         if(!complete) {
             if (evaluateAchievement(gameScreen)) {
                 gameScreen.setScore(gameScreen.getScore() + scoreValue);
-                System.out.println(name + " Achievement complete!");
+                System.out.println(name + " Achievement complete! at times: " + timeAtFirstValue + ", " + gameScreen.getTime());
+                complete = true;
             }
         }
     }
@@ -103,13 +103,12 @@ public class Achievement {
         return (goalValue <= currentValue);
     }
 
-    public String getName(){return this.name;}
 
-    public String getStatusMessage(){
+    public String getStatusMessage(int currentTime){
         String s= "";
         s+="Kill " + this.goalValue;
         s+= this.type==0 ? " patrols" : " fortresses";
-        String seconds = this.timeAtLastValue==null ? String.valueOf(this.timeCondition) : String.valueOf(this.timeAtLastValue);
+        String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf((this.timeAtFirstValue - currentTime));
         s+=" in "+ seconds + " seconds";
 
         return s;
