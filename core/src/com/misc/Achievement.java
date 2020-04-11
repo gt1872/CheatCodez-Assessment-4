@@ -46,7 +46,7 @@ public class Achievement {
         this.timeCondition = null;
     }
 
-    void checkCondition(int gameTime){
+    public void checkCondition(int gameTime){
         if (timeCondition == null) { //if no time condition
             currentValue++; //then increase the value
         }
@@ -103,5 +103,16 @@ public class Achievement {
         return (goalValue <= currentValue);
     }
 
+    public String getName(){return this.name;}
+
+    public String getStatusMessage(){
+        String s= "";
+        s+="Kill " + this.goalValue;
+        s+= this.type==0 ? " patrols" : " fortresses";
+        String seconds = this.timeAtLastValue==null ? String.valueOf(this.timeCondition) : String.valueOf(this.timeAtLastValue);
+        s+=" in "+ seconds + " seconds";
+
+        return s;
+    }
 
 }

@@ -79,13 +79,13 @@ public class GameScreen implements Screen, Json.Serializable {
 	private float zoomTarget;
 
 	// Private sprite related objects
-	private ArrayList<ETFortress> ETFortresses;
+	public ArrayList<ETFortress> ETFortresses;
 	private final ArrayList<PowerUp> powerUps;
-	private ArrayList<Projectile> projectiles;
+	public ArrayList<Projectile> projectiles;
 	private ArrayList<MinigameSprite> minigameSprites;
 	private ArrayList<Projectile> projectilesToRemove;
 	private ArrayList<PowerUp> powerUpsToRemove;
-	private ArrayList<Patrol> ETPatrols;
+	public ArrayList<Patrol> ETPatrols;
 	private ArrayList<Achievement> achievements;
 	private final Firestation firestation;
 	private final ArrayList<Texture> waterFrames;
@@ -99,6 +99,8 @@ public class GameScreen implements Screen, Json.Serializable {
 	// Private stage values
 	private final Stage stage;
 	private final Label scoreLabel;
+	private final Label achieveLabel;
+
 	private final Label timeLabel;
 	private final Label fpsLabel;
 
@@ -179,6 +181,10 @@ public class GameScreen implements Screen, Json.Serializable {
 
 		scoreLabel = new Label("", game.getFont10());
 		table.add(scoreLabel).top();
+
+		// Added for assessment 4
+		achieveLabel = new Label("", game.getFont10());
+		table.add(achieveLabel).bottom();
 
 		Stack tipStack = new Stack();
 		tip = new TypingLabel("", game.getFont10());
@@ -323,7 +329,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		}, 20,10);
 
 		this.achievements = new ArrayList<>();
-		
+		achievements.add(new Achievement("Kill 5 in 30 seconds", 5, 500, 1, 30));
 		isInTutorial = true;
 
 	}
@@ -501,6 +507,10 @@ public class GameScreen implements Screen, Json.Serializable {
 		// Check if the game should end
 		checkIfGameOver();
 		checkIfCarpark();
+
+
+		this.achieveLabel.setText(achievements.get(0).getStatusMessage());
+
 
 	}
 
@@ -1286,6 +1296,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	void updateAchievements(){
 		for(Achievement achievement: achievements){
 			achievement.update(this);
+		}
 	}
 
 	/**
