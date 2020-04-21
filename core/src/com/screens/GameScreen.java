@@ -1155,6 +1155,8 @@ public class GameScreen implements Screen, Json.Serializable {
 				"{SLOW}{COLOR=#FFFFFFC0}You spawned right outside here. This is where you can repair and refill Fire Trucks...");
 		popupMessages.addLast("{SLOW}{COLOR=#FFFFFFC0}Top right, once that timer reaches zero, the Fire Station is vulnerable and can be destroyed, " +
 				"then you can no longer repair or refill...");
+		popupMessages.addLast("{SLOW}{COLOR=#FFFFFFC0}Bottom left, you can see currently equipped power ups \n" + // <--- added for assessment 4
+				"these are found around the map \n");
 		popupMessages.addLast("{FADE=0;0.75;1}Score{ENDFADE} \n" +
 				"{SLOW}{COLOR=#FFFFFFC0}Top left, achieved by attacking Patrols and Fortresses, and can be spent to unlock new trucks " +
 				"at the Fire Station...");
