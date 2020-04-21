@@ -518,6 +518,8 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.stage.act(delta);
 		this.stage.draw();
 
+		//update achievements -- added for section 4
+		updateAchievements();
 
 		//update achievements -- added for section 4
 		//has to be done before checking for collisions

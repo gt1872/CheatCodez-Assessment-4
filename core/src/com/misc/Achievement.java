@@ -44,8 +44,10 @@ public class Achievement {
         this.type = type;
         this.goalValue = goalValue;
         this.scoreValue = scoreValue;
+
         this.complete = false;
         this.timeAtFirstValue = null;
+
     }
 
 
@@ -83,9 +85,11 @@ public class Achievement {
         }
     }
 
+    /* Check the current achievements status */
     public void update(GameScreen gameScreen){
-
+        // If not complete yet
         if(!complete) {
+            // Check the achievement
             if (evaluateAchievement(gameScreen)) {
                 gameScreen.setScore(gameScreen.getScore() + scoreValue);
                 System.out.println(name + " Achievement complete! at times: " + timeAtFirstValue + ", " + gameScreen.getTime());
@@ -94,6 +98,7 @@ public class Achievement {
         }
     }
 
+    /* Check the achievement against the appropriate condition */
     boolean evaluateAchievement(GameScreen gameScreen){
         switch (type){
             case 1:
@@ -114,7 +119,6 @@ public class Achievement {
             String s= "";
             s+="Kill " + this.goalValue;
             s+= this.type==1 ? " patrols " : " fortresses ";
-
             String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
             s+=" in "+ seconds + " seconds";
             return s;
