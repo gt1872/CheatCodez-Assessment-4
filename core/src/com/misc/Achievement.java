@@ -30,6 +30,14 @@ public class Achievement {
 
     private int scoreValue;
 
+    /**
+     * Constructor for achievements
+     * @param name name of the task
+     * @param goalValue how many you want to destroy
+     * @param scoreValue score once complete
+     * @param type type 1 or 2 depending on what you want destroyed
+     * @param timeCondition time to complete
+     */
     public Achievement(String name, float goalValue, int scoreValue, Integer type, Integer timeCondition){
         this.timeCondition = timeCondition;
         this.name = name;
@@ -38,13 +46,6 @@ public class Achievement {
         this.scoreValue = scoreValue;
     }
 
-    public Achievement(String name, float goalValue, int scoreValue, Integer type){
-        this.name = name;
-        this.type = type;
-        this.goalValue = goalValue;
-        this.scoreValue = scoreValue;
-        this.timeCondition = null;
-    }
 
     void checkCondition(int gameTime){
         if (timeCondition == null) { //if no time condition
@@ -53,6 +54,7 @@ public class Achievement {
         else if (timeAtFirstValue == null) { //if there is a time condition but this is the first kill
             currentValue++; //then increase the value
             timeAtFirstValue = gameTime; //update time counter
+
         }
         else if (timeCondition >= (gameTime - timeAtFirstValue)) {//if there's a time condition and it is met
             currentValue++; //then increase the value
@@ -80,6 +82,7 @@ public class Achievement {
     }
 
     public void update(GameScreen gameScreen){
+
         if(!complete) {
             if (evaluateAchievement(gameScreen)) {
                 gameScreen.setScore(gameScreen.getScore() + scoreValue);
@@ -105,13 +108,22 @@ public class Achievement {
 
 
     public String getStatusMessage(int currentTime){
-        String s= "";
-        s+="Kill " + this.goalValue;
-        s+= this.type==0 ? " patrols" : " fortresses";
-        String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf((this.timeAtFirstValue - currentTime));
-        s+=" in "+ seconds + " seconds";
+        if (!complete){
+            String s= "";
+            s+="Kill " + this.goalValue;
+            s+= this.type==1 ? " patrols " : " fortresses ";
 
-        return s;
+            String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
+            s+=" in "+ seconds + " seconds";
+            return s;
+        } else if (timeCondition-(this.timeAtFirstValue - currentTime)<1){
+
+            return "FAILED MISSION!";
+        } else {
+            return null;
+        }
     }
+
+    public boolean isComplete() {return this.complete;}
 
 }

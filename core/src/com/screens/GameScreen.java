@@ -71,8 +71,9 @@ public class GameScreen implements Screen, Json.Serializable {
 	private final OrthogonalTiledMapRenderer renderer;
 	private final int[] foregroundLayers;
     private final int[] backgroundLayers;
+    private final Timer achievementsTimer;
 
-	// Private values for the game
+    // Private values for the game
 	private int score;
 	private int time;
 	private int powerUpTime;
@@ -329,12 +330,42 @@ public class GameScreen implements Screen, Json.Serializable {
 		}, 20,10);
 
 		this.achievements = new ArrayList<>();
-		this.achievements.add(new Achievement("Kill 3 Patrols in 100 seconds",3,10,1, 100));
+		this.achievementsTimer = new Timer();
+		// Time for spawning new achievements
+		this.achievementsTimer.scheduleTask(new Task() {
+            @Override
+            public void run() {
+                createAchievement();
+            }
+        }, 5, 30);
 		isInTutorial = true;
 
 	}
 
-	public GameScreen(Kroy game, String gameload){
+    /**
+     * Create new achievement every 60 seconds if there is no achievements active
+     */
+    private void createAchievement() {
+	    if (this.achievements.size()==0) {
+            Random r = new Random();
+
+            // Set amount of times that can be used for an achievement
+            int[] times = new int[]{30, 60, 90, 150};
+            // Time to complete the achievement, chosen randomly
+            int timecondition = times[r.nextInt(times.length)];
+            // Goal value, how many you need to destroy
+	        int goalValue = r.nextInt(5-2) + 2;
+	        // Score applied based on the time condition and goal value
+	        int scoreValue = goalValue*10*timecondition;
+	        // Which type of task
+	        int type = (int) Math.round( Math.random() )+1;
+	        // Which type of task is it
+            String typeString = type==1 ? " patrols ": " fortresses " ;
+            this.achievements.add(new Achievement(String.format("Kill %d %s in %d seconds", goalValue, typeString, timecondition),goalValue,scoreValue,type, timecondition));
+        }
+    }
+
+    public GameScreen(Kroy game, String gameload){
 		this(game);
 		this.isInTutorial=false;
 		loadGame(gameload);
@@ -478,11 +509,7 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.stage.act(delta);
 		this.stage.draw();
 
-		// ---- 4) Perform any calulcation needed after sprites are drawn - //
 
-		//update achievements -- added for section 4
-		updateAchievements();
-		
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
@@ -509,8 +536,24 @@ public class GameScreen implements Screen, Json.Serializable {
 		checkIfCarpark();
 
 
+        //update achievements -- added for section 4
+        updateAchievements();
 
-		this.achieveLabel.setText(achievements.get(0).getStatusMessage(this.getTime()));
+        if (achievements.size()>0){
+            String status = achievements.get(0).getStatusMessage(this.getTime());
+            this.achieveLabel.setText(status);
+
+            if (!achievements.get(0).isComplete()){
+                System.out.println(status);
+                if (status.equals("FAILED MISSION!")){
+                    this.achievements.remove(0);
+                }
+            } else {
+                this.achieveLabel.setText("SUCCESSFULLY COMPLETED MISSION!");
+                this.achievements.remove(0);
+            }
+        }
+
 
 
 	}
