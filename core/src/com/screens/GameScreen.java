@@ -358,10 +358,19 @@ public class GameScreen implements Screen, Json.Serializable {
 	        // Score applied based on the time condition and goal value
 	        int scoreValue = goalValue*10*timecondition;
 	        // Which type of task
-	        int type = (int) Math.round( Math.random() )+1;
+	        int type = r.nextInt(2);
 	        // Which type of task is it
             String typeString = type==1 ? " patrols ": " fortresses " ;
-            this.achievements.add(new Achievement(String.format("Kill %d %s in %d seconds", goalValue, typeString, timecondition),goalValue,scoreValue,type, timecondition));
+            this.achievements.add(
+            		new Achievement(
+            				String.format("Kill %d %s in %d seconds",
+									goalValue,
+									typeString,
+									timecondition),
+							goalValue,
+							scoreValue,
+							type,
+							timecondition));
         }
     }
 
@@ -512,6 +521,10 @@ public class GameScreen implements Screen, Json.Serializable {
 		//update achievements -- added for section 4
 		updateAchievements();
 
+		//update achievements -- added for section 4
+		//has to be done before checking for collisions
+		updateAchievements();
+
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
@@ -544,7 +557,7 @@ public class GameScreen implements Screen, Json.Serializable {
             this.achieveLabel.setText(status);
 
             if (!achievements.get(0).isComplete()){
-                System.out.println(status);
+                //System.out.println(status);
                 if (status.equals("FAILED MISSION!")){
                     this.achievements.remove(0);
                 }
@@ -1198,6 +1211,8 @@ public class GameScreen implements Screen, Json.Serializable {
 				"{SLOW}{COLOR=#FFFFFFC0}You spawned right outside here. This is where you can repair and refill Fire Trucks...");
 		popupMessages.addLast("{SLOW}{COLOR=#FFFFFFC0}Top right, once that timer reaches zero, the Fire Station is vulnerable and can be destroyed, " +
 				"then you can no longer repair or refill...");
+		popupMessages.addLast("{SLOW}{COLOR=#FFFFFFC0}Bottom left, you can see currently equipped power ups \n" + // <--- added for assessment 4
+				"these are found around the map \n");
 		popupMessages.addLast("{FADE=0;0.75;1}Score{ENDFADE} \n" +
 				"{SLOW}{COLOR=#FFFFFFC0}Top left, achieved by attacking Patrols and Fortresses, and can be spent to unlock new trucks " +
 				"at the Fire Station...");
