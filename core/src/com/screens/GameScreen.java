@@ -509,6 +509,8 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.stage.act(delta);
 		this.stage.draw();
 
+		//update achievements -- added for section 4
+		updateAchievements();
 
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
@@ -536,8 +538,6 @@ public class GameScreen implements Screen, Json.Serializable {
 		checkIfCarpark();
 
 
-        //update achievements -- added for section 4
-        updateAchievements();
 
         if (achievements.size()>0){
             String status = achievements.get(0).getStatusMessage(this.getTime());
