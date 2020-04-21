@@ -360,7 +360,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	        // Which type of task
 	        int type = (int) Math.round( Math.random() )+1;
 	        // Which type of task is it
-            String typeString = type==0 ? " fortresses " : " patrols ";
+            String typeString = type==1 ? " patrols ": " fortresses " ;
             this.achievements.add(new Achievement(String.format("Kill %d %s in %d seconds", goalValue, typeString, timecondition),goalValue,scoreValue,type, timecondition));
         }
     }

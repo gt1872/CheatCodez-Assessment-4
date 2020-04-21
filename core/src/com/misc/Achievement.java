@@ -111,7 +111,7 @@ public class Achievement {
         if (!complete){
             String s= "";
             s+="Kill " + this.goalValue;
-            s+= this.type==0 ? " fortresses " : " patrols ";
+            s+= this.type==1 ? " patrols " : " fortresses ";
 
             String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
             s+=" in "+ seconds + " seconds";
