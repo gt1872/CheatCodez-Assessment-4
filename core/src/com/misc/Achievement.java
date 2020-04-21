@@ -47,7 +47,7 @@ public class Achievement {
 
         this.complete = false;
         this.timeAtFirstValue = null;
-
+        System.out.println(timeCondition);
     }
 
 
@@ -110,6 +110,8 @@ public class Achievement {
             default:
                 return false;
         }
+        System.out.println(goalValue);
+        System.out.println(currentValue);
         return (goalValue <= currentValue);
     }
 
@@ -117,7 +119,7 @@ public class Achievement {
     public String getStatusMessage(int currentTime){
         if (!complete){
             String s= "";
-            s+="Kill " + this.goalValue;
+            s+="Kill " + (this.goalValue - this.currentValue);
             s+= this.type==1 ? " patrols " : " fortresses ";
             String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
             s+=" in "+ seconds + " seconds";
