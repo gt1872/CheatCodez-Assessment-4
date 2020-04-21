@@ -358,10 +358,19 @@ public class GameScreen implements Screen, Json.Serializable {
 	        // Score applied based on the time condition and goal value
 	        int scoreValue = goalValue*10*timecondition;
 	        // Which type of task
-	        int type = (int) Math.round( Math.random() )+1;
+	        int type = r.nextInt(2);
 	        // Which type of task is it
             String typeString = type==1 ? " patrols ": " fortresses " ;
-            this.achievements.add(new Achievement(String.format("Kill %d %s in %d seconds", goalValue, typeString, timecondition),goalValue,scoreValue,type, timecondition));
+            this.achievements.add(
+            		new Achievement(
+            				String.format("Kill %d %s in %d seconds",
+									goalValue,
+									typeString,
+									timecondition),
+							goalValue,
+							scoreValue,
+							type,
+							timecondition));
         }
     }
 
@@ -510,6 +519,10 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.stage.draw();
 
 
+		//update achievements -- added for section 4
+		//has to be done before checking for collisions
+		updateAchievements();
+
 		// Check for any collisions
 		if (!isInTutorial) checkForCollisions();
 
@@ -536,15 +549,13 @@ public class GameScreen implements Screen, Json.Serializable {
 		checkIfCarpark();
 
 
-        //update achievements -- added for section 4
-        updateAchievements();
 
         if (achievements.size()>0){
             String status = achievements.get(0).getStatusMessage(this.getTime());
             this.achieveLabel.setText(status);
 
             if (!achievements.get(0).isComplete()){
-                System.out.println(status);
+                //System.out.println(status);
                 if (status.equals("FAILED MISSION!")){
                     this.achievements.remove(0);
                 }

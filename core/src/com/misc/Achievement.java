@@ -44,6 +44,8 @@ public class Achievement {
         this.type = type;
         this.goalValue = goalValue;
         this.scoreValue = scoreValue;
+        this.complete = false;
+        this.timeAtFirstValue = null;
     }
 
 
