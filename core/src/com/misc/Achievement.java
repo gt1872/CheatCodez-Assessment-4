@@ -78,6 +78,7 @@ public class Achievement {
     }
 
     void checkFortressDeath(GameScreen gameScreen){
+        currentValue = 0;
         for (ETFortress fortress : gameScreen.ETFortresses){
             if(fortress.isFlooded()) {
                 checkCondition(gameScreen.getTime());
@@ -122,7 +123,8 @@ public class Achievement {
             String seconds = this.timeAtFirstValue==null ? String.valueOf(this.timeCondition) : String.valueOf(timeCondition-(this.timeAtFirstValue - currentTime));
             s+=" in "+ seconds + " seconds";
             return s;
-        } else if (timeCondition-(this.timeAtFirstValue - currentTime)<1){
+        }
+        else if (timeCondition-(this.timeAtFirstValue - currentTime)<1){
 
             return "FAILED MISSION!";
         } else {

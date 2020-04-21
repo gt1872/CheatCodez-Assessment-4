@@ -214,7 +214,8 @@ public final class Constants {
         omniBoost(1.1f,1.1f, 1.1f, 1.1f, 1.1f, new Texture("PowerUps/ALL-INCREASE.png")),
         attackBoost(1f,1f, 1f, 1.1f, 1.1f, new Texture("PowerUps/ATTACK-INCREASE.png")),
         speedBoost(1f,1f, 1.25f, 1f, 1f, new Texture("PowerUps/SPEED-INCREASE.png")),
-        waterBoost(1f,1.5f, 1f, 1f, 1f, new Texture("PowerUps/WATER-INCREASE.png"));
+        waterBoost(1f,1.5f, 1f, 1f, 1f, new Texture("PowerUps/WATER-INCREASE.png")),
+        emptySlot(1.0f,1.0f,1.0f,1.0f,1.0f,new Texture("PowerUps/WATER-INCREASE.png"));
 
         private final float healthMultiplier;
         private final float waterMultiplier;
