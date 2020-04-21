@@ -358,7 +358,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	        // Score applied based on the time condition and goal value
 	        int scoreValue = goalValue*10*timecondition;
 	        // Which type of task
-	        int type = r.nextInt(2);
+	        int type = (int) (Math.random() + 1);
 	        // Which type of task is it
             String typeString = type==1 ? " patrols ": " fortresses " ;
             this.achievements.add(
