@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.entities.Firestation;
+import com.misc.Constants;
 import com.misc.GameSave;
 import com.misc.SFX;
 import com.pathFinding.Junction;
@@ -358,12 +359,7 @@ public class GameScreen implements Screen, Json.Serializable {
 	        // Score applied based on the time condition and goal value
 	        int scoreValue = goalValue*10*timecondition;
 	        // Which type of task
-<<<<<<< HEAD
-	        int type = 2; //(int) (Math.random() + 1);
-=======
-	        int type = r.nextInt(2);
-
->>>>>>> 6a5c922c30cb34d2ab404e7c535d1a14bd397862
+	        int type = (int) (Math.random() + 1);
 	        // Which type of task is it
             String typeString = type==1 ? " patrols ": " fortresses " ;
             this.achievements.add(
@@ -523,10 +519,6 @@ public class GameScreen implements Screen, Json.Serializable {
 		this.stage.act(delta);
 		this.stage.draw();
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 6a5c922c30cb34d2ab404e7c535d1a14bd397862
 		//update achievements -- added for section 4
 		//has to be done before checking for collisions
 		updateAchievements();
@@ -542,6 +534,10 @@ public class GameScreen implements Screen, Json.Serializable {
 		stage.getBatch().begin();
 		for (PowerUp p : getActiveTruck().getPowerups()){
 			stage.getBatch().draw(p.getTexture(), 100 + 75 * count, 100, 50, 50);
+			count++;
+		}
+		for(int i = 0; i < getActiveTruck().getType().getProperties()[8] - getActiveTruck().getNumberOfPowerups(); i++){
+			stage.getBatch().draw(PowerUpType.emptySlot.getTexture(), 100 + 75 * count, 100, 50, 50);
 			count++;
 		}
 		stage.getBatch().end();
