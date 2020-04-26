@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.misc.Constants;
 import com.screens.GameScreen;
+import com.screens.MainMenuScreen;
 import com.testrunner.GdxTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,5 +113,29 @@ public class ETFortressTest {
         etFortressUnderTest.update(mockBatch);
         float healthAfter = etFortressUnderTest.getHealthBar().getCurrentAmount();
         assertEquals(healthAfter, healthBefore, 0.0);
+    }
+
+    @Test
+    public void testHealthEasy(){
+        Constants.DIFFICULTY_MODIFIER = Constants.DIFFICULTY_EASY_MODIFIER;
+        etFortressUnderTest = new ETFortress(mockTexture, mockDestroyedTexture, 1.0f, 1.0f, 0.0f, 0.0f, Constants.FortressType.CLIFFORD, mockGameScreen);
+        float health = etFortressUnderTest.getHealthBar().getCurrentAmount();
+        assertEquals(health, 40, 0.0);
+    }
+
+    @Test
+    public void testHealthNormal(){
+        Constants.DIFFICULTY_MODIFIER = Constants.DIFFICULTY_MEDIUM_MODIFIER;
+        etFortressUnderTest = new ETFortress(mockTexture, mockDestroyedTexture, 1.0f, 1.0f, 0.0f, 0.0f, Constants.FortressType.CLIFFORD, mockGameScreen);
+        float health = etFortressUnderTest.getHealthBar().getCurrentAmount();
+        assertEquals(health, 80, 0.0);
+    }
+
+    @Test
+    public void testHealthHard(){
+        Constants.DIFFICULTY_MODIFIER = Constants.DIFFICULTY_HARD_MODIFIER;
+        etFortressUnderTest = new ETFortress(mockTexture, mockDestroyedTexture, 1.0f, 1.0f, 0.0f, 0.0f, Constants.FortressType.CLIFFORD, mockGameScreen);
+        float health = etFortressUnderTest.getHealthBar().getCurrentAmount();
+        assertEquals(health, 160, 0.0);
     }
 }
