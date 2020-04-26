@@ -21,10 +21,12 @@ task debug(dependsOn: classes, type: JavaExec) {
     standardInput = System.in
     workingDir = project.assetsDir
     ignoreExitValue = true
-    debug = true
+    debug = false
 }
 
 task dist(type: Jar) {
+    project.ext.assetsDir = new File("../assets/assets");
+
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
