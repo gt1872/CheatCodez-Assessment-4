@@ -190,7 +190,7 @@ public class MainMenuScreen implements Screen {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				SFX.sfx_button_click.play();
-				game.setScreen(new SavesScreen(game, new GameScreen(game), "load"));
+				game.setScreen(new SavesScreen(game, new GameScreen(game) , "load"));
 				dispose();
 			}
 		});

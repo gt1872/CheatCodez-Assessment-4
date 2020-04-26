@@ -1,5 +1,6 @@
 package com.misc;
 import com.Kroy;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -29,7 +30,11 @@ public class GameSave {
 
     public ArrayList loadGame(String filepath) {
         try {
-            FileInputStream f = new FileInputStream(new File("./gamesaves/"+filepath));
+            System.out.println("./assets/gamesaves/"+filepath);
+
+            FileInputStream f = new FileInputStream(
+                    new File(
+                        Gdx.files.internal("./assets/gamesaves/"+filepath).path()));
             ObjectInputStream o = new ObjectInputStream(f);
 
             Object obj = o.readObject();
@@ -57,10 +62,12 @@ public class GameSave {
 
         try {
             // Create filename of datetime
-            String filename = "./gamesaves/"+file+"-"+this.genSaveName();
+            String filename = "./assets/gamesaves/"+file+"-"+this.genSaveName();
+
             deleteOldSave(file);
             // Open/Create the new file save using OutputStream as we are writing
-            FileOutputStream f = new FileOutputStream(new File(filename));
+            FileOutputStream f = new FileOutputStream(
+                    new File(filename));
             ObjectOutputStream o = new ObjectOutputStream(f);
 
             // Write the objects array we made in GameScreen, this allows us to recover the whole array later
@@ -77,7 +84,7 @@ public class GameSave {
     }
 
     public void deleteOldSave(String file){
-        String dirName = "./gamesaves/";
+        String dirName = "./assets/gamesaves/";
 
         File fileName = new File(dirName);
         File[] fileList = fileName.listFiles();
@@ -94,9 +101,9 @@ public class GameSave {
             files.add("Empty");
         }
 
-        String dirName = "./gamesaves/";
+        String dirName = "./assets/gamesaves/";
 
-        File fileName = new File(dirName);
+        File fileName = new File(Gdx.files.internal(dirName).path());
         File[] fileList = fileName.listFiles();
 
         for (int f=0; f<5; f++){
