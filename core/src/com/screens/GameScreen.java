@@ -343,6 +343,8 @@ public class GameScreen implements Screen, Json.Serializable {
 
 	}
 
+
+	// ============ ADDED FOR ASSESSMENT 4 ========================
     /**
      * Create new achievement every 60 seconds if there is no achievements active
      */

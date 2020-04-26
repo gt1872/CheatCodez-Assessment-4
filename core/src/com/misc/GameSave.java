@@ -30,7 +30,11 @@ public class GameSave {
 
     public ArrayList loadGame(String filepath) {
         try {
-            FileInputStream f = new FileInputStream(new File("./assets/gamesaves/"+filepath));
+            System.out.println("./assets/gamesaves/"+filepath);
+
+            FileInputStream f = new FileInputStream(
+                    new File(
+                        Gdx.files.internal("./assets/gamesaves/"+filepath).path()));
             ObjectInputStream o = new ObjectInputStream(f);
 
             Object obj = o.readObject();
