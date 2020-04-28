@@ -176,26 +176,6 @@ public class MainMenuScreen implements Screen {
 		});
 
 
-		/*
-			=======================================
-					Added for Assessment 4
-			=======================================
-		 */
-
-		TextButton loadButton = new TextButton("Load Game", skin);
-		buttonTable.add(loadButton).width(200).height(40).padBottom(20);
-		buttonTable.row();
-
-		loadButton.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				SFX.sfx_button_click.play();
-				game.setScreen(new SavesScreen(game, new GameScreen(game) , "load"));
-				dispose();
-			}
-		});
-
-		//================END of Additions==============
 		buttonTable.add(quitButton).width(200).height(40);
 
 		quitButton.addListener(new ClickListener() {
